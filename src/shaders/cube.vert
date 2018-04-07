@@ -5,7 +5,7 @@ uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 uniform vec4 light_position;
-uniform vec3 offsets[128];
+uniform vec3 offsets[512];
 
 // out vec4 vs_light_direction_0;
 // out vec4 vertex_position_world_0;
