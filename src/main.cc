@@ -38,6 +38,14 @@ const char* floor_fragment_shader =
 #include "shaders/floor.frag"
 ;
 
+const char* cube_vertex_shader =
+#include "shaders/cube.vert"
+;
+
+const char* cube_fragment_shader =
+#include "shaders/cube.frag"
+;
+
 // FIXME: Add more shaders here.
 
 void ErrorCallback(int error, const char* description) {
@@ -79,7 +87,14 @@ int main(int argc, char* argv[])
 	std::vector<glm::uvec3> floor_faces;
 	create_floor(floor_vertices, floor_faces);
 
+	std::vector<glm::vec4> cube_vertices;
+	std::vector<glm::uvec3> cube_faces;
+	std::vector<glm::vec4> cube_normals;
+	create_cube(cube_vertices, cube_faces, cube_normals);
 
+		
+	std::vector<glm::vec3> cube_offsets;
+	create_offsets(cube_offsets);
 
 	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
 	MatrixPointers mats; // Define MatrixPointers here for lambda to capture
@@ -108,6 +123,9 @@ int main(int argc, char* argv[])
 	auto int_binder = [](int loc, const void* data) {
 		glUniform1iv(loc, 1, (const GLint*)data);
 	};
+	auto cube_offsets_binder = [&cube_offsets](int loc, const void* data) {
+		glUniform3fv(loc, cube_offsets.size(), (const GLfloat*)data);
+	};
 	
 
 	/*
@@ -120,6 +138,10 @@ int main(int argc, char* argv[])
 	auto floor_model_data = [&floor_model_matrix]() -> const void* {
 		return &floor_model_matrix[0][0];
 	}; // This return model matrix for the floor.
+	glm::mat4 cube_model_matrix = glm::mat4(1.0f);
+	auto cube_model_data = [&cube_model_matrix]() -> const void* {
+		return &cube_model_matrix[0][0];
+	};
 	auto std_view_data = [&mats]() -> const void* {
 		return mats.view;
 	};
@@ -127,6 +149,7 @@ int main(int argc, char* argv[])
 		return &gui.getCamera()[0];
 	};
 	auto std_proj_data = [&mats]() -> const void* {
+		// std::cout << "projection data acquired" << std::endl;
 		return mats.projection;
 	};
 	auto std_light_data = [&light_position]() -> const void* {
@@ -140,6 +163,11 @@ int main(int argc, char* argv[])
 		else
 			return &non_transparet;
 	};
+	auto cube_offsets_data =  [&cube_offsets]() -> const void* {
+		// std::cout << "offsets data acquired, size = " << cube_offsets.size() << std::endl;
+		return cube_offsets.data();
+	};
+
 	// FIXME: add more lambdas for data_source if you want to use RenderPass.
 	//        Otherwise, do whatever you like here
 
@@ -147,11 +175,14 @@ int main(int argc, char* argv[])
 	
 	ShaderUniform std_model = { "model", matrix_binder, std_model_data };
 	ShaderUniform floor_model = { "model", matrix_binder, floor_model_data };
+	ShaderUniform cube_model = {"model", matrix_binder, cube_model_data};
 	ShaderUniform std_view = { "view", matrix_binder, std_view_data };
 	ShaderUniform std_camera = { "camera_position", vector3_binder, std_camera_data };
 	ShaderUniform std_proj = { "projection", matrix_binder, std_proj_data };
 	ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
 	ShaderUniform object_alpha = { "alpha", float_binder, alpha_data };
+
+	ShaderUniform cube_offsets_uniform = {"offsets", cube_offsets_binder, cube_offsets_data};
 
 	// Floor render pass
 	RenderDataInput floor_pass_input;
@@ -167,9 +198,19 @@ int main(int argc, char* argv[])
 	//        Otherwise, do whatever you like here
 
 
+	// Cube render pass
+	RenderDataInput cube_pass_input;
+	cube_pass_input.assign(0, "vertex_position", cube_vertices.data(), cube_vertices.size(), 4, GL_FLOAT);
+	cube_pass_input.assignIndex(cube_faces.data(), cube_faces.size(), 3);
+	RenderPass cube_pass(-1,
+			cube_pass_input,
+			{cube_vertex_shader, nullptr, cube_fragment_shader},
+			{cube_model, std_view, std_proj, std_light, cube_offsets_uniform},
+			{"fragment_color"}
+			);
 
 	bool draw_floor = true;
-	
+	bool draw_cube = true;
 
 	while (!glfwWindowShouldClose(window)) {
 		// Setup some basic window stuff.
@@ -200,6 +241,18 @@ int main(int argc, char* argv[])
 			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
 			                              floor_faces.size() * 3,
 			                              GL_UNSIGNED_INT, 0));
+		}
+
+		if (draw_cube) {
+			cube_pass.setup();
+			// CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
+			//                               cube_faces.size() * 3,
+			//                               GL_UNSIGNED_INT, 0));
+			CHECK_GL_ERROR(glDrawElementsInstanced(GL_TRIANGLES,
+					                              cube_faces.size() * 3,
+					                              GL_UNSIGNED_INT, 0,
+					                              cube_offsets.size()));
+			// std::cout << "offset size: " << cube_offsets.size() << std::endl;
 		}
 
 		// Poll and swap.
