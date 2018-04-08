@@ -16,11 +16,13 @@ public:
 	
 	void sinusoidalTransform();
 	void perlinTransform();	// to be impelemted
-
+	
 
 	std::vector<glm::vec4> cube_vertices;
 	std::vector<glm::uvec3> cube_faces;
 	std::vector<glm::vec3> cube_positions;
+	std::vector<glm::vec4> cube_normals;
+	std::vector<glm::vec2> cube_uvs;
 
 private:
 	Perlin perlin_;

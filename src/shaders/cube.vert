@@ -1,28 +1,28 @@
 R"zzz(#version 410 core
 in vec4 vertex_position;
+in vec4 normal;
+in vec2 uv;
+
+out vec4 vs_light_direction;
+out vec4 vs_normal;
+out vec2 vs_uv;
+out vec4 vs_camera_direction;
 
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
-
 uniform vec4 light_position;
+uniform vec3 camera_position;
 
 uniform vec3 offsets[512];
 
-// out vec4 vs_light_direction_0;
-// out vec4 vertex_position_world_0;
-// out vec4 vs_light_direction;
-// out vec4 vertex_position_world;
+
 void main()
 {
-	vec4 pos = vec4(vertex_position.xyz + offsets[gl_InstanceID], 1.0);
-	mat4 mvp = projection * view * model;
-	gl_Position = mvp * pos;
-	
-	// gl_Position = view * vertex_position;
-	// vs_light_direction_0 = -gl_Position + view * light_position;
-	// vertex_position_world_0 = vertex_position;
-	// vs_light_direction = -gl_Position + view * light_position;
-	// vertex_position_world = vertex_position;
+	gl_Position = vertex_position + glm::vec4(offsets[gl_InstanceID ], 0.0);	
+	vs_light_direction = -gl_Position + light_position;
+	vs_camera_direction = vec4(camera_position, 1.0) - gl_Position;
+	vs_normal = normal;
+	vs_uv = uv;
 }
 )zzz"

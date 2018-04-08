@@ -44,6 +44,10 @@ const char* cube_vertex_shader =
 #include "shaders/cube.vert"
 ;
 
+const char* cube_geometry_shader = 
+#include "shaders/cube.geom"
+;
+
 const char* cube_fragment_shader =
 #include "shaders/cube.frag"
 ;
@@ -90,11 +94,12 @@ int main(int argc, char* argv[])
 	create_floor(floor_vertices, floor_faces);
 
 	float cube_width = 10.0;
-	int x_size = 10, z_size = 20;
+	int x_size = 20, z_size = 20;
 
 	TerrainGenerator terrain_generator(cube_width, x_size, z_size);
 	// terrain_generator.sinusoidalTransform();
 	terrain_generator.perlinTransform();
+	
 
 	// Perlin perlin;
 	// for(float x = 0.0; x < 10.0; x++) {
@@ -213,11 +218,14 @@ int main(int argc, char* argv[])
 	// Cube render pass
 	RenderDataInput cube_pass_input;
 	cube_pass_input.assign(0, "vertex_position", terrain_generator.cube_vertices.data(), terrain_generator.cube_vertices.size(), 4, GL_FLOAT);
+	cube_pass_input.assign(1, "normal", terrain_generator.cube_normals.data(), terrain_generator.cube_normals.size(), 4, GL_FLOAT);
+	cube_pass_input.assign(2, "uv", terrain_generator.cube_uvs.data(), terrain_generator.cube_uvs.size(), 2, GL_FLOAT);
 	cube_pass_input.assignIndex(terrain_generator.cube_faces.data(), terrain_generator.cube_faces.size(), 3);
+
 	RenderPass cube_pass(-1,
 			cube_pass_input,
-			{cube_vertex_shader, nullptr, cube_fragment_shader},
-			{cube_model, std_view, std_proj, std_light, cube_positions_uniform},
+			{cube_vertex_shader, cube_geometry_shader, cube_fragment_shader},
+			{cube_model, std_view, std_proj, std_light, std_camera, cube_positions_uniform},
 			{"fragment_color"}
 			);
 
