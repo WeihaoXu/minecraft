@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "perlin.h"
+
 
 class TerrainGenerator {
 public:
@@ -13,7 +15,7 @@ public:
 
 	
 	void sinusoidalTransform();
-	void perlineTransform();	// to be impelemted
+	void perlinTransform();	// to be impelemted
 
 
 	std::vector<glm::vec4> cube_vertices;
@@ -21,7 +23,7 @@ public:
 	std::vector<glm::vec3> cube_positions;
 
 private:
-	// Perlin* perlin_;
+	Perlin perlin_;
 	void addCube(glm::vec3 grid_coord);
 	void generateUnitCube(float cube_width);
 	void generatePlane(int x_size_, int z_size_);

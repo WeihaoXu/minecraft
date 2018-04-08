@@ -7,6 +7,7 @@
 #include "config.h"
 #include "gui.h"
 #include "terrain_generator.h"
+#include "perlin.h"
 
 #include <algorithm>
 #include <fstream>
@@ -88,12 +89,20 @@ int main(int argc, char* argv[])
 	std::vector<glm::uvec3> floor_faces;
 	create_floor(floor_vertices, floor_faces);
 
-	float cube_width = 2.0;
+	float cube_width = 10.0;
 	int x_size = 10, z_size = 20;
 
 	TerrainGenerator terrain_generator(cube_width, x_size, z_size);
-	terrain_generator.sinusoidalTransform();
+	// terrain_generator.sinusoidalTransform();
+	terrain_generator.perlinTransform();
 
+	// Perlin perlin;
+	// for(float x = 0.0; x < 10.0; x++) {
+	// 	for(float z = 0.0; z < 10.0; z++) {	
+	// 		std::cout << perlin.noise3D(x / 3.0, 0.0, z / 3.0) << ", ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
 
 
 		
