@@ -231,11 +231,12 @@ int main(int argc, char* argv[])
 
 		if(gui.isPoseDirty()) {
 			terrain_generator.updateTerrain(gui.getCamera());
-			std::cout << "camera position: " << gui.getCamera().x << ", " << gui.getCamera().z << std::endl;
-			std::cout << "first position: " << terrain_generator.cube_positions[0].x << "," << terrain_generator.cube_positions[0].z << std::endl;
-			std::cout << "last position: " << terrain_generator.cube_positions[x_size * z_size - 1].x << "," 
-											<< terrain_generator.cube_positions[x_size * z_size - 1].z << std::endl;
-			std::cout << std::endl;
+			// std::cout << "camera position: " << gui.getCamera().x << ", " << gui.getCamera().z << std::endl;
+			// std::cout << "first position: " << terrain_generator.cube_positions[0].x << "," << terrain_generator.cube_positions[0].z << std::endl;
+			// std::cout << "last position: " << terrain_generator.cube_positions[x_size * z_size - 1].x << "," 
+			// 								<< terrain_generator.cube_positions[x_size * z_size - 1].z << std::endl;
+			// std::cout << "height of first cube: " << terrain_generator.getHeight(terrain_generator.cube_positions[0].x, terrain_generator.cube_positions[0].z) << std::endl;
+			// std::cout << std::endl;
 			gui.clearPose();
 		}
 

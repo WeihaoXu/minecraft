@@ -144,3 +144,9 @@ bool TerrainGenerator::updateTerrain(glm::vec3 camera_position) {
 
 }
 
+// Get the terrain height at (pos_x, pos_z) position.
+float TerrainGenerator::getHeight(float pos_x, float pos_z) {
+	int grid_x = std::floor(pos_x / cube_width_) - grid_shift_x_;
+	int grid_z = std::floor(pos_z / cube_width_) - grid_shift_z_;
+	return height_map_[grid_x][grid_z] * cube_width_;
+}

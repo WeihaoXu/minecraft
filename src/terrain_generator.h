@@ -14,7 +14,7 @@ public:
 	~TerrainGenerator();
 
 	bool updateTerrain(glm::vec3 camera_position);
-	
+	float getHeight(float pos_x, float pos_z);
 
 	std::vector<glm::vec4> cube_vertices;
 	std::vector<glm::uvec3> cube_faces;
