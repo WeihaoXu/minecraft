@@ -89,7 +89,7 @@ void TerrainGenerator::generateUnitCube() {
 
 void TerrainGenerator::generateHeightMap()
 {
-	height_map_.clear();
+	// height_map_.clear();
 
 	float center_x = camera_position_.x, center_z = camera_position_.z;
 	int grid_center_x = std::floor(center_x / cube_width_), grid_center_z = std::floor(center_z / cube_width_);
@@ -104,15 +104,11 @@ void TerrainGenerator::generateHeightMap()
 			int pos_z = grid_z + grid_shift_z_;
 
 			// std::cout << pos_x << ", " << pos_z << std::endl;
-			int grid_y = std::floor(perlin_height_amp_ * abs((float) perlin_.noise3D(pos_x * perlin_freq_, 0.0, pos_z * perlin_freq_)));
+			int grid_y = std::floor(perlin_height_amp_ * (float) perlin_.noise3D(pos_x * perlin_freq_, 0.0, pos_z * perlin_freq_));
 			height_map_[grid_x][grid_z] = grid_y;
 			
 			// std::cout << "grid_y = " << grid_y << std::endl;
 			
-			if(grid_x == 0 && grid_z == 63) {
-				std::cout << "[0, 63]! grid_y = " << height_map_[grid_x][grid_z] << std::endl;
-			}
-
 		}
 	}
 }
@@ -127,44 +123,29 @@ void TerrainGenerator::generateCubes() {
 			int top_grid_y = height_map_[grid_x][grid_z];
 			cube_positions.push_back(gridToWorld(grid_x, top_grid_y, grid_z));
 
-			if(top_grid_y > 10) {
-				std::cout << "large top value = " << top_grid_y << " cur_x = "<< grid_x << "cur_z = " << grid_z << std::endl;
-			}
-
+		
 			// std::cout << "1" << std::endl;
 			// fill gaps of neighbors
 			int cube_to_fill_num = 0;
 			if(grid_x > 0) {
 				cube_to_fill_num = std::max(top_grid_y - height_map_[grid_x - 1][grid_z], cube_to_fill_num);
-				if(cube_to_fill_num > 10) {
-					std::cout << "large cube_to_fill_num, top_grid_y = " << top_grid_y << " left: " << height_map_[grid_x - 1][grid_z] << " cur_x = "<< grid_x << "cur_z = " << grid_z << std::endl;
-				}
 			}
 			// std::cout << "2" << std::endl;
 
 			if(grid_x < x_size_ - 1) {
 				cube_to_fill_num = std::max(top_grid_y - height_map_[grid_x + 1][grid_z], cube_to_fill_num);
-				if(cube_to_fill_num > 10) {
-					std::cout << "large cube_to_fill_num, top_grid_y = " << top_grid_y << " right: " << height_map_[grid_x + 1][grid_z] << " cur_x = "<< grid_x << "cur_z = " << grid_z << std::endl;
-				}
 			}
 
 			// std::cout << "3" << std::endl;
 
 			if(grid_z > 0) {
 				cube_to_fill_num = std::max(top_grid_y - height_map_[grid_x][grid_z - 1], cube_to_fill_num);
-				if(cube_to_fill_num > 10) {
-					std::cout << "large cube_to_fill_num, top_grid_y = " << top_grid_y << " front: " << height_map_[grid_x][grid_z - 1] << " cur_x = "<< grid_x << "cur_z = " << grid_z << std::endl;
-				}
 			}
 
 			// std::cout << "4" << std::endl;
 
 			if(grid_z < z_size_ - 1) {
 				cube_to_fill_num = std::max(top_grid_y - height_map_[grid_x][grid_z + 1], cube_to_fill_num);
-				if(cube_to_fill_num > 10) {
-					std::cout << "large cube_to_fill_num, top_grid_y = " << top_grid_y << " back: " << height_map_[grid_x][grid_z + 1] << " cur_x = "<< grid_x << "cur_z = " << grid_z << std::endl;
-				}
 			}
 
 			// std::cout << "5" << std::endl;
