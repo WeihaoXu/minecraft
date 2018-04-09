@@ -83,9 +83,9 @@ void TerrainGenerator::perlinTransform() {
 	for(int grid_x = 0; grid_x < x_size_; grid_x++) {
 		for(int grid_z = 0; grid_z < z_size_; grid_z++) {
 			glm::vec3& cube_pos = cube_positions[grid_x * z_size_ + grid_z];
-			float freq = 0.79938;
-
-			cube_pos.y = cube_width_ * perlin_.noise3D(cube_pos.x / freq, 0.0, cube_pos.z / freq);
+			float freq = 0.005;
+			int y_scale = 5;
+			cube_pos.y = cube_width_ * std::floor(y_scale * perlin_.noise3D(cube_pos.x * freq, 0.0, cube_pos.z * freq));
 
 			// float x_perlin = 1.0 * grid_x / x_size_;
 			// float z_perlin = 1.0 * grid_z / z_size_;

@@ -29,9 +29,11 @@ private:
 	void addCube(glm::vec3 grid_coord);
 	void generateUnitCube(float cube_width);
 	void generatePlane(int x_size_, int z_size_);
-
+	
+	
 	float cube_width_;
 	int x_size_, z_size_;	//the width and height of this terrain (in cube numbers)
+	std::vector<std::vector<float>> height_map_;
 
 };
 
