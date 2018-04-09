@@ -9,6 +9,9 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "tictoc.h"
+#include "glm/ext.hpp"
+
 
 GUI::GUI(GLFWwindow* window)
 	:window_(window)
@@ -21,6 +24,7 @@ GUI::GUI(GLFWwindow* window)
 	glfwGetWindowSize(window_, &window_width_, &window_height_);
 	float aspect_ = static_cast<float>(window_width_) / window_height_;
 	projection_matrix_ = glm::perspective((float)(kFov * (M_PI / 180.0f)), aspect_, kNear, kFar);
+	minecraft_character = new MinecraftCharacter();
 }
 
 GUI::~GUI()
@@ -34,11 +38,13 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window_, GL_TRUE);
 		return ;
+	} 
+	if(key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+		if(loading_mode_){
+			//JUMP CHARACTER
+			minecraft_character->setJumping();
+		}
 	}
-	if (key == GLFW_KEY_J && action == GLFW_RELEASE) {
-		//FIXME save out a screenshot using SaveJPEG
-	}
-
 	if (captureWASDUPDOWN(key, action))
 		return ;
 	if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT) {
@@ -50,12 +56,12 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		// FIXME: actually roll the bone here
 	} else if (key == GLFW_KEY_C && action != GLFW_RELEASE) {
 		fps_mode_ = !fps_mode_;
-	} else if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_RELEASE) {
-
-	} else if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_RELEASE) {
-	
-	} else if (key == GLFW_KEY_T && action != GLFW_RELEASE) {
-		transparent_ = !transparent_;
+	} else if ((key == GLFW_KEY_F && (mods & GLFW_MOD_CONTROL)) && action == GLFW_RELEASE) {
+		loading_mode_ = !loading_mode_;
+		if(loading_mode_){
+			minecraft_character->timer = tic();
+			eye_ = minecraft_character->getCharacterPosition();
+		}
 	}
 }
 
@@ -84,9 +90,10 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 				);
 		orientation_ =
 			glm::mat3(glm::rotate(rotation_speed_, axis) * glm::mat4(orientation_));
-		tangent_ = glm::column(orientation_, 0);
-		up_ = glm::column(orientation_, 1);
+		//tangent_ = glm::column(orientation_, 0);
+		//up_ = glm::column(orientation_, 1);
 		look_ = glm::column(orientation_, 2);
+		//up_ = glm::cross(tangent_, look_);
 	} 
 
 	
@@ -101,6 +108,11 @@ void GUI::mouseButtonCallback(int button, int action, int mods)
 void GUI::updateMatrices()
 {
 	// Compute our view, and projection matrices.
+	if(loading_mode_){
+		up_ = glm::vec3(0.0f, 1.0f, 0.0f);
+		look_ = glm::vec3(0.0f, 0.0f, -1.0f);
+		center_ = eye_ + camera_distance_ * look_;
+	}
 	if (fps_mode_)
 		center_ = eye_ + camera_distance_ * look_;
 	else
@@ -125,42 +137,67 @@ MatrixPointers GUI::getMatrixPointers() const
 }
 
 
-
+void GUI::doJump(){
+	//std::cout << "I AM JUMPING" << "\n";
+	minecraft_character->jump();
+	eye_ = minecraft_character->getCharacterPosition();
+}
 
 bool GUI::captureWASDUPDOWN(int key, int action)
 {
 	if (key == GLFW_KEY_W) {
-		if (fps_mode_)
+		//std::cout << glm::to_string(eye_) << "\n";
+		if(loading_mode_){
+			//MOVE CHARACTER FORWARD
+			eye_ += zoom_speed_ * look_;
+			minecraft_character->setCharacterPosition(eye_);
+		} else if (fps_mode_)
 			eye_ += zoom_speed_ * look_;
 		else
 			camera_distance_ -= zoom_speed_;
 		return true;
 	} else if (key == GLFW_KEY_S) {
-		if (fps_mode_)
+		if(loading_mode_){
+			//MOVE CHARACTER BACKWARD
+			eye_ -= zoom_speed_ * look_;
+			minecraft_character->setCharacterPosition(eye_);
+		} else if (fps_mode_)
 			eye_ -= zoom_speed_ * look_;
 		else
 			camera_distance_ += zoom_speed_;
 		return true;
 	} else if (key == GLFW_KEY_A) {
-		if (fps_mode_)
+		if(loading_mode_){
+			//STRAFE CHARACTER
+			eye_ -= pan_speed_ * tangent_;
+			minecraft_character->setCharacterPosition(eye_);
+		} else if (fps_mode_)
 			eye_ -= pan_speed_ * tangent_;
 		else
 			center_ -= pan_speed_ * tangent_;
 		return true;
 	} else if (key == GLFW_KEY_D) {
-		if (fps_mode_)
+		if(loading_mode_){
+			//STRAFE CHARACTER
+			eye_ += pan_speed_ * tangent_;
+			minecraft_character->setCharacterPosition(eye_);
+		} else if (fps_mode_)
 			eye_ += pan_speed_ * tangent_;
 		else
 			center_ += pan_speed_ * tangent_;
 		return true;
 	} else if (key == GLFW_KEY_DOWN) {
-		if (fps_mode_)
+		if(loading_mode_){
+			return false;
+		} if (fps_mode_)
 			eye_ -= pan_speed_ * up_;
 		else
 			center_ -= pan_speed_ * up_;
 		return true;
 	} else if (key == GLFW_KEY_UP) {
-		if (fps_mode_)
+		if(loading_mode_){
+			return false;
+		} if (fps_mode_)
 			eye_ += pan_speed_ * up_;
 		else
 			center_ += pan_speed_ * up_;

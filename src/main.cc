@@ -171,14 +171,6 @@ int main(int argc, char* argv[])
 	auto std_light_data = [&light_position]() -> const void* {
 		return &light_position[0];
 	};
-	auto alpha_data  = [&gui]() -> const void* {
-		static const float transparet = 0.5; // Alpha constant goes here
-		static const float non_transparet = 1.0;
-		if (gui.isTransparent())
-			return &transparet;
-		else
-			return &non_transparet;
-	};
 	auto cube_positions_data = [&terrain_generator]() -> const void* {
 		// std::cout << "offsets data acquired, size = " << cube_positions.size() << std::endl;
 		return terrain_generator.cube_positions.data();
@@ -197,7 +189,6 @@ int main(int argc, char* argv[])
 	ShaderUniform std_camera = { "camera_position", vector3_binder, std_camera_data };
 	ShaderUniform std_proj = { "projection", matrix_binder, std_proj_data };
 	ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
-	ShaderUniform object_alpha = { "alpha", float_binder, alpha_data };
 
 	// ShaderUniform cube_positions_uniform = {"offsets", cube_positions_binder, cube_positions_data};
 
@@ -250,9 +241,8 @@ int main(int argc, char* argv[])
 		gui.updateMatrices();
 		mats = gui.getMatrixPointers();
 
-		if (gui.isPoseDirty()) {
-			// update animation
-			gui.clearPose();
+		if(gui.isCharacterJumping()){
+			gui.doJump();
 		}
 
 		// // Then draw floor.

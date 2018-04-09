@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
+#include "minecraft_character.h"
+
 struct Mesh;
 
 /*
@@ -32,26 +34,20 @@ public:
 
 	glm::vec3 getCenter() const { return center_; }
 	const glm::vec3& getCamera() const { return eye_; }
-	bool isPoseDirty() const { return pose_changed_; }
-	void clearPose() { pose_changed_ = false; }
 	const float* getLightPositionPtr() const { return &light_position_[0]; }
-	
-	// int getCurrentBone() const { return current_bone_; }
-	// const int* getCurrentBonePointer() const { return &current_bone_; }
-	// bool setCurrentBone(int i);
 
-	bool isTransparent() const { return transparent_; }
+	bool isCharacterJumping() const {return minecraft_character->isJumping(); }
+	void doJump();
 private:
 	GLFWwindow* window_;
-	// Mesh* mesh_;
+	MinecraftCharacter* minecraft_character;
 
 	int window_width_, window_height_;
 
 	bool drag_state_ = false;
 	bool fps_mode_ = false;
-	bool pose_changed_ = true;
-	bool transparent_ = false;
-	// int current_bone_ = -1;
+	bool loading_mode_ = false;
+
 	int current_button_ = -1;
 	float roll_speed_ = M_PI / 64.0f * 5;
 	float last_x_ = 0.0f, last_y_ = 0.0f, current_x_ = 0.0f, current_y_ = 0.0f;
