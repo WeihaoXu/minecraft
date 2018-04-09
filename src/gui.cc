@@ -53,6 +53,7 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		// FIXME: actually roll the bone here
 	} else if (key == GLFW_KEY_C && action != GLFW_RELEASE) {
 		fps_mode_ = !fps_mode_;
+		std::cout << "toggle fps_mode_, current: " << fps_mode_ << std::endl;
 	} else if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_RELEASE) {
 
 	} else if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_RELEASE) {
