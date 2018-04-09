@@ -96,9 +96,9 @@ int main(int argc, char* argv[])
 	float cube_width = 10.0;
 	int x_size = 200, z_size = 200;
 
-	TerrainGenerator terrain_generator(cube_width, x_size, z_size);
+	TerrainGenerator terrain_generator(cube_width, x_size, z_size, gui.getCamera());
 	// terrain_generator.sinusoidalTransform();
-	terrain_generator.perlinTransform();
+	// terrain_generator.perlinTransform();
 	
 
 	// Perlin perlin;

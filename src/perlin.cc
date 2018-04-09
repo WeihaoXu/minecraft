@@ -21,7 +21,7 @@ Perlin::Perlin() {
 	}
 }
 
-float Perlin::noise3D(float x, float y, float z) {
+double Perlin::noise3D(double x, double y, double z) {
 	int X = (int) floor(x) & 255;
 	int Y = (int) floor(y) & 255;
 	int Z = (int) floor(z) & 255;
@@ -30,9 +30,9 @@ float Perlin::noise3D(float x, float y, float z) {
 	y -= floor(y);
 	z -= floor(z);
 
-	float u = fade(x);
-	float v = fade(y);
-	float w = fade(z);
+	double u = fade(x);
+	double v = fade(y);
+	double w = fade(z);
 
 	int A = p[X  ]+Y, AA = p[A]+Z, AB = p[A+1]+Z,      // HASH COORDINATES OF
     	B = p[X+1]+Y, BA = p[B]+Z, BB = p[B+1]+Z;      // THE 8 CUBE CORNERS,
@@ -47,17 +47,17 @@ float Perlin::noise3D(float x, float y, float z) {
 }
 
 
-float Perlin::fade(float t) {
+double Perlin::fade(double t) {
 	return t * t * t * (t * (t * 6 - 15) + 10);
 }
 
-float Perlin::lerp(float t, float a, float b) { 
+double Perlin::lerp(double t, double a, double b) { 
 	return a + t * (b - a); 
 }
 
-float Perlin::grad(int hash, float x, float y, float z) {
+double Perlin::grad(int hash, double x, double y, double z) {
 	int h = hash & 15;                      // CONVERT LO 4 BITS OF HASH CODE
-	float u = h<8 ? x : y,                 // INTO 12 GRADIENT DIRECTIONS.
+	double u = h<8 ? x : y,                 // INTO 12 GRADIENT DIRECTIONS.
 	      v = h<4 ? y : h==12||h==14 ? x : z;
 	return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
 }
