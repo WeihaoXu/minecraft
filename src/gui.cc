@@ -27,7 +27,10 @@ GUI::~GUI()
 {
 }
 
-
+void GUI::assignTerrainGenerator(TerrainGenerator* terrain_generator)
+{
+	terrain_generator_ = terrain_generator;
+}
 
 void GUI::keyCallback(int key, int scancode, int action, int mods)
 {
@@ -134,38 +137,57 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 			eye_ += zoom_speed_ * look_;
 		else
 			camera_distance_ -= zoom_speed_;
+		
+		pose_changed_ = true;
+		
 		return true;
 	} else if (key == GLFW_KEY_S) {
 		if (fps_mode_)
 			eye_ -= zoom_speed_ * look_;
 		else
 			camera_distance_ += zoom_speed_;
+		
+		pose_changed_ = true;
+		
 		return true;
 	} else if (key == GLFW_KEY_A) {
 		if (fps_mode_)
 			eye_ -= pan_speed_ * tangent_;
 		else
 			center_ -= pan_speed_ * tangent_;
+		
+		pose_changed_ = true;
+		
 		return true;
 	} else if (key == GLFW_KEY_D) {
 		if (fps_mode_)
 			eye_ += pan_speed_ * tangent_;
 		else
 			center_ += pan_speed_ * tangent_;
+		
+		pose_changed_ = true;
+		
 		return true;
 	} else if (key == GLFW_KEY_DOWN) {
 		if (fps_mode_)
 			eye_ -= pan_speed_ * up_;
 		else
 			center_ -= pan_speed_ * up_;
+		
+		pose_changed_ = true;
+		
 		return true;
 	} else if (key == GLFW_KEY_UP) {
 		if (fps_mode_)
 			eye_ += pan_speed_ * up_;
 		else
 			center_ += pan_speed_ * up_;
+		
+		pose_changed_ = true;
+		
 		return true;
 	}
+
 	return false;
 }
 

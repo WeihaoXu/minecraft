@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
+#include "terrain_generator.h"
+
 struct Mesh;
 
 /*
@@ -18,7 +20,6 @@ class GUI {
 public:
 	GUI(GLFWwindow*);
 	~GUI();
-	// void assignMesh(Mesh*);
 
 	void keyCallback(int key, int scancode, int action, int mods);
 	void mousePosCallback(double mouse_x, double mouse_y);
@@ -34,16 +35,17 @@ public:
 	const glm::vec3& getCamera() const { return eye_; }
 	bool isPoseDirty() const { return pose_changed_; }
 	void clearPose() { pose_changed_ = false; }
+	void setPoseDirty() { pose_changed_ = true; }
 	const float* getLightPositionPtr() const { return &light_position_[0]; }
+
+	void assignTerrainGenerator(TerrainGenerator* terrain_generator);
 	
-	// int getCurrentBone() const { return current_bone_; }
-	// const int* getCurrentBonePointer() const { return &current_bone_; }
-	// bool setCurrentBone(int i);
+
 
 	bool isTransparent() const { return transparent_; }
 private:
 	GLFWwindow* window_;
-	// Mesh* mesh_;
+	TerrainGenerator* terrain_generator_;
 
 	int window_width_, window_height_;
 
@@ -62,7 +64,7 @@ private:
 	float aspect_;
 
 	// glm::vec3 eye_ = glm::vec3(0.0f, 0.1f, camera_distance_);
-	glm::vec3 eye_ = glm::vec3(0.0f, 30.0f, camera_distance_);
+	glm::vec3 eye_ = glm::vec3(0.0f, 10.0f, camera_distance_);
 	glm::vec3 up_ = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 look_ = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 tangent_ = glm::cross(look_, up_);

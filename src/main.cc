@@ -93,24 +93,14 @@ int main(int argc, char* argv[])
 	std::vector<glm::uvec3> floor_faces;
 	create_floor(floor_vertices, floor_faces);
 
-	float cube_width = 10.0;
-	int x_size = 200, z_size = 200;
+	float cube_width = 2.0;
+	int x_size = 100, z_size = 100;
 
 	TerrainGenerator terrain_generator(cube_width, x_size, z_size, gui.getCamera());
-	// terrain_generator.sinusoidalTransform();
-	// terrain_generator.perlinTransform();
-	
-
-	// Perlin perlin;
-	// for(float x = 0.0; x < 10.0; x++) {
-	// 	for(float z = 0.0; z < 10.0; z++) {	
-	// 		std::cout << perlin.noise3D(x / 3.0, 0.0, z / 3.0) << ", ";
-	// 	}
-	// 	std::cout << std::endl;
-	// }
+	gui.assignTerrainGenerator(&terrain_generator);
+	gui.setPoseDirty();
 
 
-		
 
 	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
 	MatrixPointers mats; // Define MatrixPointers here for lambda to capture
@@ -199,21 +189,6 @@ int main(int argc, char* argv[])
 	ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
 	ShaderUniform object_alpha = { "alpha", float_binder, alpha_data };
 
-	// ShaderUniform cube_positions_uniform = {"offsets", cube_positions_binder, cube_positions_data};
-
-	// Floor render pass
-	RenderDataInput floor_pass_input;
-	floor_pass_input.assign(0, "vertex_position", floor_vertices.data(), floor_vertices.size(), 4, GL_FLOAT);
-	floor_pass_input.assignIndex(floor_faces.data(), floor_faces.size(), 3);
-	RenderPass floor_pass(-1,
-			floor_pass_input,
-			{ vertex_shader, geometry_shader, floor_fragment_shader},
-			{ floor_model, std_view, std_proj, std_light },
-			{ "fragment_color" }
-			);
-	// FIXME: define more ShaderUniforms for RenderPass if you want to use it.
-	//        Otherwise, do whatever you like here
-
 
 	// Cube render pass
 	RenderDataInput cube_pass_input;
@@ -222,7 +197,8 @@ int main(int argc, char* argv[])
 	cube_pass_input.assign(2, "uv", terrain_generator.cube_uvs.data(), terrain_generator.cube_uvs.size(), 2, GL_FLOAT);
 	cube_pass_input.assign(3, "offset", terrain_generator.cube_positions.data(), terrain_generator.cube_positions.size(), 3, GL_FLOAT);
 	cube_pass_input.assignIndex(terrain_generator.cube_faces.data(), terrain_generator.cube_faces.size(), 3);
-
+	
+	
 	RenderPass cube_pass(-1,
 			cube_pass_input,
 			{cube_vertex_shader, cube_geometry_shader, cube_fragment_shader},
@@ -230,6 +206,8 @@ int main(int argc, char* argv[])
 			{"fragment_color"}
 			);
 
+	
+	
 	bool draw_floor = true;
 	bool draw_cube = true;
 
@@ -250,32 +228,33 @@ int main(int argc, char* argv[])
 		gui.updateMatrices();
 		mats = gui.getMatrixPointers();
 
-		if (gui.isPoseDirty()) {
-			// update animation
+
+		if(gui.isPoseDirty()) {
+			terrain_generator.updateTerrain(gui.getCamera());
+			std::cout << "camera position: " << gui.getCamera().x << ", " << gui.getCamera().z << std::endl;
+			std::cout << "first position: " << terrain_generator.cube_positions[0].x << "," << terrain_generator.cube_positions[0].z << std::endl;
+			std::cout << "last position: " << terrain_generator.cube_positions[x_size * z_size - 1].x << "," 
+											<< terrain_generator.cube_positions[x_size * z_size - 1].z << std::endl;
+			std::cout << std::endl;
 			gui.clearPose();
 		}
 
-		// // Then draw floor.
-		// if (draw_floor) {
-		// 	floor_pass.setup();
-		// 	// Draw our triangles.
-		// 	CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
-		// 	                              floor_faces.size() * 3,
-		// 	                              GL_UNSIGNED_INT, 0));
-		// }
-
-		if (draw_cube) {
-			cube_pass.setup();
-			// CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
-			//                               terrain_generator.cube_faces.size() * 3,
-			//                               GL_UNSIGNED_INT, 0));
-			CHECK_GL_ERROR(glDrawElementsInstanced(GL_TRIANGLES,
-					                              terrain_generator.cube_faces.size() * 3,
-					                              GL_UNSIGNED_INT, 0,
-					                              terrain_generator.cube_positions.size()));
-			// std::cout << "offset size: " << cube_positions.size() << std::endl;
-		}
 		glVertexAttribDivisor(3, 1);
+		cube_pass.setup();
+		cube_pass.updateVBO(3, 
+						terrain_generator.cube_positions.data(), 
+						terrain_generator.cube_positions.size());
+		CHECK_GL_ERROR(glDrawElementsInstanced(GL_TRIANGLES,
+				                              terrain_generator.cube_faces.size() * 3,
+				                              GL_UNSIGNED_INT, 0,
+				                              terrain_generator.cube_positions.size()));
+
+
+
+			
+			// std::cout << "offset size: " << cube_positions.size() << std::endl;
+		
+		
 
 		// Poll and swap.
 		glfwPollEvents();

@@ -13,9 +13,7 @@ public:
 	TerrainGenerator(float cube_width, int terrain_x_size, int terrain_z_size, glm::vec3 camera_position);
 	~TerrainGenerator();
 
-	
-	void sinusoidalTransform();
-	void perlinTransform();	// to be impelemted
+	bool updateTerrain(glm::vec3 camera_position);
 	
 
 	std::vector<glm::vec4> cube_vertices;
@@ -28,9 +26,9 @@ private:
 	Perlin perlin_;
 	// void addCube(glm::vec3 grid_coord);
 	void generateUnitCube();
-	void generateHeightMap();	// compute height map based on camera position
+	bool generateHeightMap();	// compute height map based on camera position
 	void generateCubes();	// generate the positions of cubes to render based on height map.
-	// void generatePlane();
+	
 	
 	glm::vec3 gridToWorld(int grid_x, int grid_y, int grid_z);
 	
@@ -39,7 +37,7 @@ private:
 	std::vector<std::vector<int>> height_map_;
 	int grid_shift_x_, grid_shift_z_;
 
-	float perlin_freq_ = 0.0378; // adjust frequency of perlin noise
+	float perlin_freq_ = 0.123; // adjust frequency of perlin noise
 	int perlin_height_amp_ = 5;	// adjust amplitude of perlin noise 
 	glm::vec3 camera_position_;	
 
