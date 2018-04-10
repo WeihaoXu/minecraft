@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "terrain_generator.h"
+#include "minecraft_character.h"
 
 struct Mesh;
 
@@ -39,21 +40,26 @@ public:
 	const float* getLightPositionPtr() const { return &light_position_[0]; }
 
 	void assignTerrainGenerator(TerrainGenerator* terrain_generator);
-	
 
 
-	bool isTransparent() const { return transparent_; }
+	bool isCharacterJumping() const {return minecraft_character->isJumping(); }
+	void doJump();
+	glm::vec3 getMinecraftCharacterPosition() const{ return minecraft_character->getCharacterPosition(); }
+	void updateMinecraftCharacterYcoordinate(float y_coord) {minecraft_character->setCharacterPosition(glm::vec3(eye_.x, y_coord, eye_.z));}
 private:
 	GLFWwindow* window_;
 	TerrainGenerator* terrain_generator_;
+	MinecraftCharacter* minecraft_character;
 
 	int window_width_, window_height_;
 
 	bool drag_state_ = false;
-	bool fps_mode_ = true;
+	bool fps_mode_ = false;
 	bool pose_changed_ = true;
 	bool transparent_ = false;
 	// int current_bone_ = -1;
+	bool loading_mode_ = false;
+
 	int current_button_ = -1;
 	float roll_speed_ = M_PI / 64.0f * 5;
 	float last_x_ = 0.0f, last_y_ = 0.0f, current_x_ = 0.0f, current_y_ = 0.0f;

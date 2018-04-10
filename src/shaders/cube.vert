@@ -18,8 +18,8 @@ uniform vec3 camera_position;
 
 void main()
 {
-	// gl_Position = vertex_position + glm::vec4(offsets[gl_InstanceID ], 0.0);	
-	gl_Position = vertex_position + glm::vec4(offset, 0.0);	
+	// gl_Position = vertex_position + vec4(offsets[gl_InstanceID ], 0.0);	
+	gl_Position = vertex_position + vec4(offset, 0.0);	
 	// vs_light_direction = -gl_Position + light_position;
 	vs_camera_direction = vec4(camera_position, 1.0) - gl_Position;
 	vs_normal = normal;
