@@ -265,7 +265,8 @@ bool GUI::setCharacterHeightToTerrain(){
 	}
 	if(! minecraft_character->isJumping()){
 		if(max > y_coord && eye_.y < (1.75f + max)){
-			minecraft_character->setJumping(max);
+			return false;
+			//minecraft_character->setJumping(max);
 		}
 		eye_.y = 1.75f + max;
 	} else {

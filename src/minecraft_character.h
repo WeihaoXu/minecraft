@@ -6,8 +6,6 @@
 #include <GLFW/glfw3.h>
 
 #include "tictoc.h"
-#include <iostream>
-#include <iomanip>
 
 class MinecraftCharacter {
 public:
