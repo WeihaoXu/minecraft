@@ -87,7 +87,8 @@ bool TerrainGenerator::generateHeightMap()
 		for(int grid_z = 0; grid_z < z_size_; grid_z++) {
 			int pos_x = grid_x + grid_shift_x_;
 			int pos_z = grid_z + grid_shift_z_;
-			int grid_y = std::floor(perlin_height_amp_ * (float) perlin_.noise3D(pos_x * perlin_freq_, 0.0, pos_z * perlin_freq_));
+			// int grid_y = std::floor(perlin_height_amp_ * (float) perlin_.noise3D(pos_x * perlin_freq_, 0.0, pos_z * perlin_freq_));
+			int grid_y = std::floor(perlin_height_amp_ * (0.3 + perlin_.noise3D(pos_x * perlin_freq_, 0.0, pos_z * perlin_freq_)));
 			if(grid_y < 0) {
 				grid_y = -1;
 			}
