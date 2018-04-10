@@ -80,19 +80,20 @@ float perlinNoise(vec3 P)
   return n_xyz;
 }
 
+float turbulence(vec3 P, float size)
+{
+  float noise = 0.0;
+  float init_size = size;
 
-float turbulence(int octaves, vec3 P, float lacunarity, float gain)
-{ 
-  float sum = 0;
-  float scale = 1;
-  float totalgain = 1;
-  for(int i=0;i<octaves;i++){
-    sum += totalgain*perlinNoise(P*scale);
-    scale *= lacunarity;
-    totalgain *= gain;
+  while(size >= 1) {
+    noise += perlinNoise(P / size) * size;
+    size /= 2.0;
   }
-  return abs(sum);
+  noise /= init_size;
+  return noise;
 }
+
+
 
 
 
@@ -102,13 +103,13 @@ vec4 generateWaterColor(vec4 world_pos) {
  
   float freq_world = 7.721;
 
-  vec3 color_0 = vec3(64, 164, 223) / 255.0 * 1.0;
-  vec3 color_1 = vec3(64, 164, 223) / 255.0 * 0.1;
+  vec3 color_0 = vec3(135, 206, 250) / 255.0 * 1.0;
+  vec3 color_1 = vec3(255, 255, 255) / 255.0 * 1.0;
 
-  float perlin_noise = perlinNoise(world_pos.xyz * freq_world);
+  float perlin_noise = turbulence(world_pos.xyz, 30.0);
 
   vec3 diffuse = lerp3D(color_0, color_1, perlin_noise);
-  vec3 color = clamp(diffuse, 0.0, 0.5);
+  vec3 color = clamp(diffuse, 0.0, 1.0);
 
   return vec4(color, 1.0);
 }

@@ -30,7 +30,7 @@ TerrainGenerator::~TerrainGenerator()
 // create a cube located at (0, 0, 0) with width = cube_width
 void TerrainGenerator::generateUnitCubes() {
 	generate_unit_cube(cube_width_, cube_vertices, cube_normals, cube_faces, cube_uvs);	// in procedure_geometry.h
-	generate_unit_cube_inside_out(0.1 * cube_width_ * x_size_, sky_cube_vertices, sky_cube_faces);
+	generate_unit_cube_inside_out(cube_width_ * x_size_, sky_cube_vertices, sky_cube_faces);
 }
 
 bool TerrainGenerator::generateHeightMap()
@@ -109,7 +109,7 @@ glm::vec3 TerrainGenerator::gridToWorld(int grid_x, int grid_y, int grid_z) {
 // Input: camera location.
 bool TerrainGenerator::updateTerrain(glm::vec3 camera_position) {
 	camera_position_ = camera_position;
-	sky_offset = gridToWorld(0, 0, 0);
+	sky_offset = gridToWorld(0, - x_size_ / 2, 0);
 	bool hasUpdate = generateHeightMap();
 	if(!hasUpdate) return false;
 	

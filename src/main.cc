@@ -272,6 +272,9 @@ int main(int argc, char* argv[])
 			// 								<< terrain_generator.cube_positions[x_size * z_size - 1].z << std::endl;
 			// std::cout << "height of first cube: " << terrain_generator.getHeight(terrain_generator.cube_positions[0].x, terrain_generator.cube_positions[0].z) << std::endl;
 			// std::cout << std::endl;
+			// std::cout << "grid[0][0] position = " << glm::to_string(terrain_generator.cube_positions[0]) <<"\n";
+			// std::cout << "sky position = " << glm::to_string(terrain_generator.sky_offset) <<"\n";
+		
 			gui.clearPose();
 		}
 
@@ -299,7 +302,6 @@ int main(int argc, char* argv[])
 		}
 			
 			// std::cout << "offset size: " << cube_positions.size() << std::endl;
-		
 		
 
 		// Poll and swap.
