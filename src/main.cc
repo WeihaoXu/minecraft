@@ -41,6 +41,20 @@ const char* floor_fragment_shader =
 #include "shaders/floor.frag"
 ;
 
+const char* sky_vertex_shader =
+#include "shaders/sky.vert"
+;
+
+const char* sky_geometry_shader = 
+#include "shaders/sky.geom"
+;
+
+const char* sky_fragment_shader =
+#include "shaders/sky.frag"
+;
+
+
+
 const char* cube_vertex_shader =
 #include "shaders/cube.vert"
 ;
@@ -175,7 +189,11 @@ int main(int argc, char* argv[])
 	};
 	auto texture_data = [&perm_tex_id]() -> const void* {
 		return (const void*)(intptr_t)perm_tex_id;
-	}; 
+	};
+	auto sky_offset_data = [&terrain_generator]() -> const void* {
+		return (const void*) &terrain_generator.sky_offset[0];
+	};
+
 
 	// FIXME: add more lambdas for data_source if you want to use RenderPass.
 	//        Otherwise, do whatever you like here
@@ -190,6 +208,21 @@ int main(int argc, char* argv[])
 	ShaderUniform std_proj = { "projection", matrix_binder, std_proj_data };
 	ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
 	ShaderUniform perm_texture = {"perm_texture", texture0_binder, texture_data};
+	ShaderUniform sky_offset = {"sky_offset", vector3_binder, sky_offset_data};
+
+
+	// sky render pass
+	RenderDataInput sky_pass_input;
+	sky_pass_input.assign(0, "vertex_position", terrain_generator.sky_cube_vertices.data(), terrain_generator.sky_cube_vertices.size(), 4, GL_FLOAT);
+	sky_pass_input.assignIndex(terrain_generator.sky_cube_faces.data(), terrain_generator.sky_cube_faces.size(), 3);
+	
+	RenderPass sky_pass(-1,
+			sky_pass_input,
+			{sky_vertex_shader, sky_geometry_shader, sky_fragment_shader},
+			{cube_model, std_view, std_proj, perm_texture, sky_offset},
+			{"fragment_color"}
+			);
+
 
 
 	// Cube render pass
@@ -199,14 +232,14 @@ int main(int argc, char* argv[])
 	cube_pass_input.assign(2, "uv", terrain_generator.cube_uvs.data(), terrain_generator.cube_uvs.size(), 2, GL_FLOAT);
 	cube_pass_input.assign(3, "offset", terrain_generator.cube_positions.data(), terrain_generator.cube_positions.size(), 3, GL_FLOAT);
 	cube_pass_input.assignIndex(terrain_generator.cube_faces.data(), terrain_generator.cube_faces.size(), 3);
-	
-	
+
 	RenderPass cube_pass(-1,
 			cube_pass_input,
 			{cube_vertex_shader, cube_geometry_shader, cube_fragment_shader},
 			{cube_model, std_view, std_proj, std_light, std_camera, perm_texture},
 			{"fragment_color"}
 			);
+
 
 	
 	
@@ -246,18 +279,24 @@ int main(int argc, char* argv[])
 			gui.doJump();
 		}
 
-		glVertexAttribDivisor(3, 1);
-		cube_pass.setup();
-		cube_pass.updateVBO(3, 
-						terrain_generator.cube_positions.data(), 
-						terrain_generator.cube_positions.size());
-		CHECK_GL_ERROR(glDrawElementsInstanced(GL_TRIANGLES,
-				                              terrain_generator.cube_faces.size() * 3,
-				                              GL_UNSIGNED_INT, 0,
-				                              terrain_generator.cube_positions.size()));
+		{
+			glVertexAttribDivisor(3, 1);
+			cube_pass.setup();
+			cube_pass.updateVBO(3, 
+							terrain_generator.cube_positions.data(), 
+							terrain_generator.cube_positions.size());
+			CHECK_GL_ERROR(glDrawElementsInstanced(GL_TRIANGLES,
+					                              terrain_generator.cube_faces.size() * 3,
+					                              GL_UNSIGNED_INT, 0,
+					                              terrain_generator.cube_positions.size()));
+		}
 
-
-
+		{
+			sky_pass.setup();
+			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
+			                              terrain_generator.sky_cube_faces.size() * 3,
+			                              GL_UNSIGNED_INT, 0));
+		}
 			
 			// std::cout << "offset size: " << cube_positions.size() << std::endl;
 		
