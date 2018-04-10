@@ -152,15 +152,48 @@ vec4 generateDirtColor(vec4 world_pos) {
 }
 
 
+vec4 generateWaterColor(vec4 world_pos) {
+  vec3 ambient = vec3(0.1, 0.1, 0.1) * 0;
+  float shininess = 0.1;
+  vec3 specular = vec3(64, 164, 223) * 0.0;
+
+  float freq_world = 7.721;
+
+  vec3 color_0 = vec3(64, 164, 223) / 255.0 * 1.0;
+  vec3 color_1 = vec3(64, 164, 223) / 255.0 * 0.1;
+
+  float perlin_noise = perlinNoise(world_pos.xyz * freq_world);
+
+  vec3 diffuse = lerp3D(color_0, color_1, perlin_noise);
+  float dot_nl = dot(normalize(light_direction), normalize(vertex_normal));
+  dot_nl = clamp(dot_nl, 0.0, 1.0);
+  
+  vec3 spec = specular * pow(max(0.0, dot(reflect(-light_direction, vertex_normal), camera_direction)), shininess);
+
+  vec3 color = clamp(dot_nl * diffuse + ambient + spec, 0.0, 0.5);
+  return vec4(color, 1.0);
+}
+
 
 void main()
 {
-  if(vertex_normal.y > 0.001) {
-    fragment_color = generateGrassColor(world_position);
+  if(world_position.y <= 0.001) {
+    if(vertex_normal.y > 0.001) {
+      fragment_color = generateWaterColor(world_position);
+    }
+    else {
+      fragment_color = glm::vec4(0.0, 0.0, 0.0, 0.0);
+    } 
   }
-  else {
-    fragment_color = generateDirtColor(world_position);
+  else  {
+    if(vertex_normal.y > 0.001) {
+      fragment_color = generateGrassColor(world_position);
+    }
+    else {
+      fragment_color = generateDirtColor(world_position);
+    } 
   } 
+  
 
 }
 
