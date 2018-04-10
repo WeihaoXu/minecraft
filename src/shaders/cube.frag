@@ -130,7 +130,7 @@ vec4 generateGrassColor(vec4 world_pos) {
 
 
 vec4 generateDirtColor(vec4 world_pos) {
-  vec3 ambient = vec3(0.1, 0.1, 0.1) * 0;
+  vec3 ambient = vec3(222, 122, 63) / 255.0 * 0.2;
   float shininess = 0.1;
   vec3 specular = vec3(0.1, 0.1, 0.1) * 0;
 
