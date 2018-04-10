@@ -100,10 +100,9 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 				);
 		orientation_ =
 			glm::mat3(glm::rotate(rotation_speed_, axis) * glm::mat4(orientation_));
-		//tangent_ = glm::column(orientation_, 0);
-		//up_ = glm::column(orientation_, 1);
+		tangent_ = glm::column(orientation_, 0);
+		up_ = glm::column(orientation_, 1);
 		look_ = glm::column(orientation_, 2);
-		//up_ = glm::cross(tangent_, look_);
 	} 
 
 	
