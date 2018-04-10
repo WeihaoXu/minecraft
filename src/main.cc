@@ -242,9 +242,6 @@ int main(int argc, char* argv[])
 			gui.clearPose();
 		}
 
-		//glm::vec3 character_pos = gui.getMinecraftCharacterPosition();
-		//float y_coord = terrain_generator.getYcoordinate(character_pos);
-		//gui.updateMinecraftCharacterYcoordinate(y_coord);
 		if(gui.isCharacterJumping()){
 			gui.doJump();
 		}

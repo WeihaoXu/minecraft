@@ -90,10 +90,10 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 	glm::vec2 mouse_end = glm::vec2(current_x_, current_y_);
 	glm::uvec4 viewport = glm::uvec4(0, 0, window_width_, window_height_);
 
-	// bool drag_camera = drag_state_ && current_button_ == GLFW_MOUSE_BUTTON_RIGHT;
+	bool drag_camera = drag_state_ && current_button_ == GLFW_MOUSE_BUTTON_RIGHT;
 
 
-	// if (drag_camera) {
+	if (drag_camera) {
 		glm::vec3 axis = glm::normalize(
 				orientation_ *
 				glm::vec3(mouse_direction.y, -mouse_direction.x, 0.0f)
@@ -104,7 +104,7 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 		//up_ = glm::column(orientation_, 1);
 		look_ = glm::column(orientation_, 2);
 		//up_ = glm::cross(tangent_, look_);
-	// } 
+	} 
 
 	
 }
@@ -161,11 +161,18 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 			//MOVE CHARACTER FORWARD
 			glm::vec3 tmp_look_ = glm::vec3(look_.x, 0.0f, look_.z);
 			eye_ += zoom_speed_ * tmp_look_;
+
+			if(! minecraft_character->isJumping()){
+				float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
+				eye_.y = 18.0f + y_coord;
+			}
+
 			minecraft_character->setCharacterPosition(eye_);
-		} else if (fps_mode_)
+		} else if (fps_mode_){
 			eye_ += zoom_speed_ * look_;
-		else
+		} else{
 			camera_distance_ -= zoom_speed_;
+		}
 		
 		pose_changed_ = true;
 		
@@ -175,11 +182,18 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 			//MOVE CHARACTER BACKWARD
 			glm::vec3 tmp_look_ = glm::vec3(look_.x, 0.0f, look_.z);
 			eye_ -= zoom_speed_ * tmp_look_;
+
+			if(! minecraft_character->isJumping()){
+				float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
+				eye_.y = 18.0f + y_coord;
+			}
+
 			minecraft_character->setCharacterPosition(eye_);
-		} else if (fps_mode_)
+		} else if (fps_mode_){
 			eye_ -= zoom_speed_ * look_;
-		else
+		} else {
 			camera_distance_ += zoom_speed_;
+		}
 		
 		pose_changed_ = true;
 		
@@ -188,11 +202,18 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		if(loading_mode_){
 			//STRAFE CHARACTER
 			eye_ -= pan_speed_ * tangent_;
+
+			if(! minecraft_character->isJumping()){
+				float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
+				eye_.y = 18.0f + y_coord;
+			}
+
 			minecraft_character->setCharacterPosition(eye_);
-		} else if (fps_mode_)
+		} else if (fps_mode_){
 			eye_ -= pan_speed_ * tangent_;
-		else
+		} else{
 			center_ -= pan_speed_ * tangent_;
+		}
 		
 		pose_changed_ = true;
 		
@@ -201,11 +222,18 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		if(loading_mode_){
 			//STRAFE CHARACTER
 			eye_ += pan_speed_ * tangent_;
+
+			if(! minecraft_character->isJumping()){
+				float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
+				eye_.y = 18.0f + y_coord;
+			}
+
 			minecraft_character->setCharacterPosition(eye_);
-		} else if (fps_mode_)
+		} else if (fps_mode_){
 			eye_ += pan_speed_ * tangent_;
-		else
+		} else {
 			center_ += pan_speed_ * tangent_;
+		}
 		
 		pose_changed_ = true;
 		

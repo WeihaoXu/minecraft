@@ -59,10 +59,8 @@ public:
 	glm::vec3 getCharacterPosition() const {return position_;}
 	float position_y_ = 0.0f;
 private:
-	glm::mat4 cylinder_ = glm::scale(glm::mat4(1.0), glm::vec3(0.5, 1.75, 0.5));
-	glm::vec3 position_ =  glm::vec3(0.0f, 30.0f, 100.0f);
-
 	
+	glm::vec3 position_ =  glm::vec3(0.0f, 30.0f, 100.0f);
 	float velocity_ = 0.0f;
 	float gravity_ = -9.81f;
 	float timeDiff_ = 0.0f;
