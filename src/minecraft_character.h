@@ -16,10 +16,11 @@ public:
 
 	TicTocTimer timer;
 	bool isJumping() const {return is_jumping_;}
-	void setJumping() {
+	void setJumping(float y_coord) {
 		is_jumping_ = true;
-		position_y_ = position_.y;
+		position_y_ = 1.75f + y_coord; //position_.y;
 		// std::cout << position_y_ << "\n";
+		jump_height += 1.0f;
 		timeDiff_ = toc(&timer);
 		move_up = true;
 	}
@@ -30,7 +31,7 @@ public:
 
 		if(move_up){
 
-			if(fabs(velocity_) > 2.0f){
+			if(fabs(velocity_) > jump_height){
 				velocity_ = 0.0f;
 				move_up = false;
 			} else {
@@ -42,6 +43,7 @@ public:
 			if(position_y_ > position_.y){
 				position_.y = position_y_;
 				velocity_ = 0.0f;
+				jump_height = 0.0f;
 				is_jumping_ = false;
 				return false;
 			}
@@ -64,6 +66,7 @@ private:
 	float velocity_ = 0.0f;
 	float gravity_ = -9.81f;
 	float timeDiff_ = 0.0f;
+	float jump_height = 0.0f;
 	bool move_up = true;
 
 	bool is_jumping_ = false;
