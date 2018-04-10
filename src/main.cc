@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 	std::vector<glm::uvec3> floor_faces;
 	create_floor(floor_vertices, floor_faces);
 
-	float cube_width = 6.0;
+	float cube_width = 1.0;
 	int x_size = 100, z_size = 100;
 
 	TerrainGenerator terrain_generator(cube_width, x_size, z_size, gui.getCamera());

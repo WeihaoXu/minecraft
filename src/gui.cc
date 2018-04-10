@@ -164,7 +164,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 
 			if(! minecraft_character->isJumping()){
 				float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
-				eye_.y = 18.0f + y_coord;
+				eye_.y = 1.75f + y_coord;
 			}
 
 			minecraft_character->setCharacterPosition(eye_);
@@ -185,7 +185,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 
 			if(! minecraft_character->isJumping()){
 				float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
-				eye_.y = 18.0f + y_coord;
+				eye_.y = 1.75f + y_coord;
 			}
 
 			minecraft_character->setCharacterPosition(eye_);
@@ -205,7 +205,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 
 			if(! minecraft_character->isJumping()){
 				float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
-				eye_.y = 18.0f + y_coord;
+				eye_.y = 1.75f + y_coord;
 			}
 
 			minecraft_character->setCharacterPosition(eye_);
@@ -214,7 +214,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		} else{
 			center_ -= pan_speed_ * tangent_;
 		}
-		
+
 		pose_changed_ = true;
 		
 		return true;
@@ -225,7 +225,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 
 			if(! minecraft_character->isJumping()){
 				float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
-				eye_.y = 18.0f + y_coord;
+				eye_.y = 1.75f + y_coord;
 			}
 
 			minecraft_character->setCharacterPosition(eye_);
