@@ -38,6 +38,8 @@ public:
 
 	bool isCharacterJumping() const {return minecraft_character->isJumping(); }
 	void doJump();
+	glm::vec3 getMinecraftCharacterPosition() const{ return minecraft_character->getCharacterPosition(); }
+	void updateMinecraftCharacterYcoordinate(float y_coord) {minecraft_character->setCharacterPosition(glm::vec3(eye_.x, y_coord, eye_.z));}
 private:
 	GLFWwindow* window_;
 	MinecraftCharacter* minecraft_character;

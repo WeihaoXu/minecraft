@@ -67,8 +67,8 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 
 void GUI::mousePosCallback(double mouse_x, double mouse_y)
 {
-	last_x_ = current_x_;
-	last_y_ = current_y_;
+	last_x_ = current_x_; // window_width_/2; //
+	last_y_ = current_y_; // window_height_/2; //
 	current_x_ = mouse_x;
 	current_y_ = window_height_ - mouse_y;
 	float delta_x = current_x_ - last_x_;
@@ -80,10 +80,10 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 	glm::vec2 mouse_end = glm::vec2(current_x_, current_y_);
 	glm::uvec4 viewport = glm::uvec4(0, 0, window_width_, window_height_);
 
-	bool drag_camera = drag_state_ && current_button_ == GLFW_MOUSE_BUTTON_RIGHT;
+	// bool drag_camera = drag_state_ && current_button_ == GLFW_MOUSE_BUTTON_RIGHT;
 
 
-	if (drag_camera) {
+	// if (drag_camera) {
 		glm::vec3 axis = glm::normalize(
 				orientation_ *
 				glm::vec3(mouse_direction.y, -mouse_direction.x, 0.0f)
@@ -94,7 +94,7 @@ void GUI::mousePosCallback(double mouse_x, double mouse_y)
 		//up_ = glm::column(orientation_, 1);
 		look_ = glm::column(orientation_, 2);
 		//up_ = glm::cross(tangent_, look_);
-	} 
+	// } 
 
 	
 }
@@ -110,13 +110,14 @@ void GUI::updateMatrices()
 	// Compute our view, and projection matrices.
 	if(loading_mode_){
 		up_ = glm::vec3(0.0f, 1.0f, 0.0f);
-		look_ = glm::vec3(0.0f, 0.0f, -1.0f);
 		center_ = eye_ + camera_distance_ * look_;
 	}
-	if (fps_mode_)
+	else if (fps_mode_){
 		center_ = eye_ + camera_distance_ * look_;
-	else
+	}
+	else{
 		eye_ = center_ - camera_distance_ * look_;
+	}
 
 	view_matrix_ = glm::lookAt(eye_, center_, up_);
 	light_position_ = glm::vec4(eye_, 1.0f);
@@ -138,7 +139,6 @@ MatrixPointers GUI::getMatrixPointers() const
 
 
 void GUI::doJump(){
-	//std::cout << "I AM JUMPING" << "\n";
 	minecraft_character->jump();
 	eye_ = minecraft_character->getCharacterPosition();
 }
@@ -149,7 +149,8 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		//std::cout << glm::to_string(eye_) << "\n";
 		if(loading_mode_){
 			//MOVE CHARACTER FORWARD
-			eye_ += zoom_speed_ * look_;
+			glm::vec3 tmp_look_ = glm::vec3(look_.x, 0.0f, look_.z);
+			eye_ += zoom_speed_ * tmp_look_;
 			minecraft_character->setCharacterPosition(eye_);
 		} else if (fps_mode_)
 			eye_ += zoom_speed_ * look_;
@@ -159,7 +160,8 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 	} else if (key == GLFW_KEY_S) {
 		if(loading_mode_){
 			//MOVE CHARACTER BACKWARD
-			eye_ -= zoom_speed_ * look_;
+			glm::vec3 tmp_look_ = glm::vec3(look_.x, 0.0f, look_.z);
+			eye_ -= zoom_speed_ * tmp_look_;
 			minecraft_character->setCharacterPosition(eye_);
 		} else if (fps_mode_)
 			eye_ -= zoom_speed_ * look_;

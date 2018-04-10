@@ -16,6 +16,8 @@ public:
 	
 	void sinusoidalTransform();
 	void perlinTransform();	// to be impelemted
+
+	float getYcoordinate(glm::vec3 character_position) { return 30.0f; }
 	
 
 	std::vector<glm::vec4> cube_vertices;
