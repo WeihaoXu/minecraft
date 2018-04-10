@@ -8,6 +8,7 @@
 #include "gui.h"
 #include "terrain_generator.h"
 #include "perlin.h"
+#include "perm_texture.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -100,7 +101,8 @@ int main(int argc, char* argv[])
 	gui.assignTerrainGenerator(&terrain_generator);
 	gui.setPoseDirty();
 
-
+	unsigned int perm_tex_id;
+	initPermTexture(&perm_tex_id);
 
 	glm::vec4 light_position = glm::vec4(0.0f, 100.0f, 0.0f, 1.0f);
 	MatrixPointers mats; // Define MatrixPointers here for lambda to capture
@@ -132,7 +134,12 @@ int main(int argc, char* argv[])
 	auto cube_positions_binder = [&terrain_generator](int loc, const void* data) {
 		glUniform3fv(loc, terrain_generator.cube_positions.size(), (const GLfloat*)data);
 	};
-	
+	auto texture0_binder = [](int loc, const void* data) {
+		CHECK_GL_ERROR(glUniform1i(loc, 0));
+		CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + 0));
+		CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, (long)data));
+		//std::cerr << " bind texture " << long(data) << std::endl;
+	};
 
 	/*
 	 * The lambda functions below are used to retrieve data
@@ -174,6 +181,9 @@ int main(int argc, char* argv[])
 		return terrain_generator.cube_positions.data();
 
 	};
+	auto texture_data = [&perm_tex_id]() -> const void* {
+		return (const void*)(intptr_t)perm_tex_id;
+	}; 
 
 	// FIXME: add more lambdas for data_source if you want to use RenderPass.
 	//        Otherwise, do whatever you like here
@@ -188,6 +198,7 @@ int main(int argc, char* argv[])
 	ShaderUniform std_proj = { "projection", matrix_binder, std_proj_data };
 	ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
 	ShaderUniform object_alpha = { "alpha", float_binder, alpha_data };
+	ShaderUniform perm_texture = {"perm_texture", texture0_binder, texture_data};
 
 
 	// Cube render pass
@@ -202,7 +213,7 @@ int main(int argc, char* argv[])
 	RenderPass cube_pass(-1,
 			cube_pass_input,
 			{cube_vertex_shader, cube_geometry_shader, cube_fragment_shader},
-			{cube_model, std_view, std_proj, std_light, std_camera},
+			{cube_model, std_view, std_proj, std_light, std_camera, perm_texture},
 			{"fragment_color"}
 			);
 

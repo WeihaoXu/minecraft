@@ -37,7 +37,7 @@ private:
 	std::vector<std::vector<int>> height_map_;
 	int grid_shift_x_, grid_shift_z_;
 
-	float perlin_freq_ = 0.123; // adjust frequency of perlin noise
+	float perlin_freq_ = 0.0323; // adjust frequency of perlin noise
 	int perlin_height_amp_ = 5;	// adjust amplitude of perlin noise 
 	glm::vec3 camera_position_;	
 
