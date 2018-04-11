@@ -73,6 +73,11 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 			eye_ = minecraft_character->getCharacterPosition();
 			setCharacterHeightToTerrain(glm::vec3(0,0,0));
 		}
+	} else if(key == GLFW_KEY_R && action == GLFW_PRESS) {
+		if(loading_mode_) {
+			terrain_generator_->deleteCube(eye_, look_);
+			terrain_modified = true;
+		}
 	}
 }
 
@@ -319,6 +324,9 @@ bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
 	}
 }
 
+void GUI::deleteCube() {
+	terrain_generator_->deleteCube(eye_, look_);
+}
 
 // Delegrate to the actual GUI object.
 void GUI::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
