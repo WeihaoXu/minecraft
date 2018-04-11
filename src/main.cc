@@ -104,6 +104,7 @@ int main(int argc, char* argv[])
 	GLFWwindow *window = init_glefw();
 	GUI gui(window);
 
+
 	std::vector<glm::vec4> floor_vertices;
 	std::vector<glm::uvec3> floor_faces;
 	create_floor(floor_vertices, floor_faces);
@@ -230,7 +231,7 @@ int main(int argc, char* argv[])
 	cube_pass_input.assign(0, "vertex_position", terrain_generator.cube_vertices.data(), terrain_generator.cube_vertices.size(), 4, GL_FLOAT);
 	cube_pass_input.assign(1, "normal", terrain_generator.cube_normals.data(), terrain_generator.cube_normals.size(), 4, GL_FLOAT);
 	cube_pass_input.assign(2, "uv", terrain_generator.cube_uvs.data(), terrain_generator.cube_uvs.size(), 2, GL_FLOAT);
-	cube_pass_input.assign(3, "offset", terrain_generator.cube_positions.data(), terrain_generator.cube_positions.size(), 3, GL_FLOAT);
+	cube_pass_input.assign(3, "offset", terrain_generator.cube_positions.data(), terrain_generator.cube_positions.size(), 4, GL_FLOAT);
 	cube_pass_input.assignIndex(terrain_generator.cube_faces.data(), terrain_generator.cube_faces.size(), 3);
 
 	RenderPass cube_pass(-1,
@@ -274,7 +275,9 @@ int main(int argc, char* argv[])
 			// std::cout << std::endl;
 			// std::cout << "grid[0][0] position = " << glm::to_string(terrain_generator.cube_positions[0]) <<"\n";
 			// std::cout << "sky position = " << glm::to_string(terrain_generator.sky_offset) <<"\n";
-		
+			for(int i = 0; i < 1000; i++) {
+				std::cout << "cube type: " << (int) terrain_generator.cube_positions[i].w << std::endl;
+			}
 			gui.clearPose();
 		}
 

@@ -1,5 +1,6 @@
 R"zzz(#version 410 core
 
+in float cube_type;
 in vec4 face_normal;
 in vec4 vertex_normal;
 // in vec4 light_direction;
@@ -19,6 +20,11 @@ out vec4 fragment_color;
 
 #define ONE 0.00390625
 #define ONEHALF 0.001953125
+#define eps 0.001
+#define TYPE_WATER 0.0
+#define TYPE_DIRT_GRASS 1.0
+#define TYPE_DIRT 2.0
+#define TYPE_STONE 3.0
 
 vec4 light_direction = vec4(normalize(vec3(0.4, 1.0, 0.6)), 0.0);
 
@@ -174,25 +180,54 @@ vec4 generateWaterColor(vec4 world_pos) {
   return vec4(color, 1.0);
 }
 
+vec4 generateStoneColor(vec4 world_pos) {
+  vec3 ambient = vec3(0.1, 0.1, 0.1) * 0;
+  float shininess = 0.1;
+  vec3 specular = vec3(64, 164, 223) * 0.0;
+
+  float freq_world = 7.721;
+
+  vec3 color_0 = vec3(71, 79, 100) / 255.0 * 1.0;
+  vec3 color_1 = vec3(71, 79, 100) / 255.0 * 0.1;
+
+  float perlin_noise = perlinNoise(world_pos.xyz * freq_world);
+
+  vec3 diffuse = lerp3D(color_0, color_1, perlin_noise);
+  float dot_nl = dot(normalize(light_direction), normalize(vertex_normal));
+  dot_nl = clamp(dot_nl, 0.0, 1.0);
+  
+  vec3 spec = specular * pow(max(0.0, dot(reflect(-light_direction, vertex_normal), camera_direction)), shininess);
+
+  vec3 color = clamp(dot_nl * diffuse + ambient + spec, 0.0, 0.5);
+  return vec4(color, 1.0);
+}
 
 void main()
 {
-  if(world_position.y <= 0.001) {
+
+  if(cube_type < TYPE_WATER + eps) {
     if(vertex_normal.y > 0.001) {
       fragment_color = generateWaterColor(world_position);
     }
     else {
-      fragment_color = vec4(0.0, 0.0, 0.0, 0.0);
+      fragment_color = vec4(0.0, 0.0, 0.0, 1.0);
     } 
   }
-  else  {
+  else if(cube_type < TYPE_DIRT_GRASS + eps) {
     if(vertex_normal.y > 0.001) {
       fragment_color = generateGrassColor(world_position);
     }
     else {
       fragment_color = generateDirtColor(world_position);
     } 
-  } 
+  }
+  else if(cube_type < TYPE_DIRT + eps) {
+    fragment_color = generateDirtColor(world_position);
+  }
+  else if(cube_type < TYPE_STONE + eps) {
+    fragment_color = generateStoneColor(world_position);
+  }
+
   
 
 }

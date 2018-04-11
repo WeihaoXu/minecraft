@@ -64,7 +64,6 @@ bool TerrainGenerator::generateHeightMap()
 				grid_y = -1;
 			}
 			height_map_[grid_x][grid_z] = grid_y;
-			
 		}
 	}
 	return true;
@@ -72,11 +71,23 @@ bool TerrainGenerator::generateHeightMap()
 
 void TerrainGenerator::generateCubes() {
 	// cube_positions.clear();
-	cube_positions = std::vector<glm::vec3>();
+	cube_positions = std::vector<glm::vec4>();
 	for(int grid_x = 0; grid_x < x_size_; grid_x++) {
 		for(int grid_z = 0; grid_z < z_size_; grid_z++) {
 			int top_grid_y = height_map_[grid_x][grid_z];
-			cube_positions.push_back(gridToWorld(grid_x, top_grid_y, grid_z));
+			CubeType cube_type;
+			if(top_grid_y < 0) {
+				cube_type = CubeType::WATER;
+			}
+			else if(top_grid_y >= perlin_height_amp_ * 0.8) {
+				cube_type = CubeType::STONE;
+			}
+			else {
+				cube_type = CubeType::DIRT_GRASS;
+			}
+
+			glm::vec3 world_pos = gridToWorld(grid_x, top_grid_y, grid_z);
+			cube_positions.push_back(glm::vec4(world_pos, (int) cube_type));
 
 			// fill gaps between neighboring cubes
 			int cube_to_fill_num = 0;
@@ -93,7 +104,8 @@ void TerrainGenerator::generateCubes() {
 				cube_to_fill_num = std::max(top_grid_y - height_map_[grid_x][grid_z + 1], cube_to_fill_num);
 			}
 			for(int y_offset = 1; y_offset <= cube_to_fill_num; y_offset++) {
-				cube_positions.push_back(gridToWorld(grid_x, top_grid_y - y_offset, grid_z));
+					glm::vec3 world_pos = gridToWorld(grid_x, top_grid_y - y_offset, grid_z);
+					cube_positions.push_back(glm::vec4(world_pos, (int) CubeType::DIRT));
 			}
 			
 		}

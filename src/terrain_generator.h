@@ -7,6 +7,7 @@
 
 #include "perlin.h"
 
+enum CubeType { WATER = 0, DIRT_GRASS, DIRT, STONE }; 
 
 class TerrainGenerator {
 public:
@@ -20,7 +21,8 @@ public:
 
 	std::vector<glm::vec4> cube_vertices;
 	std::vector<glm::uvec3> cube_faces;
-	std::vector<glm::vec3> cube_positions;
+	std::vector<glm::vec4> cube_positions;
+	// std::vector<glm::vec4> cube_positions;	// <x, y, z, cube_Id>
 	std::vector<glm::vec4> cube_normals;
 	std::vector<glm::vec2> cube_uvs;
 
@@ -46,7 +48,6 @@ private:
 	int perlin_height_amp_ = 5;	// adjust amplitude of perlin noise 
 	glm::vec3 camera_position_;
 	
-
 };
 
 
