@@ -83,6 +83,7 @@ private:
 	glm::mat4 model_matrix_ = glm::mat4(1.0f);
 
 	bool captureWASDUPDOWN(int key, int action);
+	bool setCharacterHeightToTerrain();
 
 };
 

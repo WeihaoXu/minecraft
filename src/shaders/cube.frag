@@ -182,7 +182,7 @@ void main()
       fragment_color = generateWaterColor(world_position);
     }
     else {
-      fragment_color = glm::vec4(0.0, 0.0, 0.0, 0.0);
+      fragment_color = vec4(0.0, 0.0, 0.0, 0.0);
     } 
   }
   else  {
