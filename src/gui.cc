@@ -160,7 +160,7 @@ void GUI::doJump(){
 
 bool GUI::captureWASDUPDOWN(int key, int action)
 {
-	if (key == GLFW_KEY_W && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
+	if (key == GLFW_KEY_W) {
 		if(action == GLFW_PRESS){
 			w_pressed_ = true;
 		}
@@ -182,7 +182,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		pose_changed_ = true;
 		
 		return true;
-	} else if (key == GLFW_KEY_S && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
+	} else if (key == GLFW_KEY_S) {
 		if(action == GLFW_PRESS){
 			s_pressed_ = true;
 		}
@@ -203,7 +203,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		pose_changed_ = true;
 		
 		return true;
-	} else if (key == GLFW_KEY_A && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
+	} else if (key == GLFW_KEY_A) {
 		if(action == GLFW_PRESS){
 			a_pressed_ = true;
 		}
@@ -223,7 +223,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		pose_changed_ = true;
 		
 		return true;
-	} else if (key == GLFW_KEY_D && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
+	} else if (key == GLFW_KEY_D) {
 		if(action == GLFW_PRESS){
 			d_pressed_ = true;
 		}
