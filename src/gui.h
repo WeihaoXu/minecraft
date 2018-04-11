@@ -41,7 +41,15 @@ public:
 
 	void assignTerrainGenerator(TerrainGenerator* terrain_generator);
 
-
+	void setJumpingCharacterHeight(glm::vec3 eye_move);
+	float getPanSpeed() const {return pan_speed_;}
+	float getZoomSpeed() const {return zoom_speed_;}
+	glm::vec3 getTangent() const {return  tangent_;}
+	glm::vec3 getLook() const {return look_;}
+	bool isWpressed() const {return w_pressed_;}
+	bool isSpressed() const {return s_pressed_;}
+	bool isApressed() const {return a_pressed_;}
+	bool isDpressed() const {return d_pressed_;}
 	bool isCharacterJumping() const {return minecraft_character->isJumping(); }
 	void doJump();
 	glm::vec3 getMinecraftCharacterPosition() const{ return minecraft_character->getCharacterPosition(); }
@@ -58,7 +66,11 @@ private:
 	bool pose_changed_ = true;
 	bool transparent_ = false;
 	// int current_bone_ = -1;
-	bool loading_mode_ = true;
+	bool loading_mode_ = false;
+	bool w_pressed_ = false;
+	bool s_pressed_ = false;
+	bool a_pressed_ = false;
+	bool d_pressed_ = false;
 
 	int current_button_ = -1;
 	float roll_speed_ = M_PI / 64.0f * 5;
@@ -84,7 +96,6 @@ private:
 
 	bool captureWASDUPDOWN(int key, int action);
 	bool setCharacterHeightToTerrain(glm::vec3 eye_move);
-
 };
 
 #endif

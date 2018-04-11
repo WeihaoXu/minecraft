@@ -23,7 +23,7 @@ public:
 	float position_y_ = 0.0f;
 private:
 	
-	glm::vec3 position_ =  glm::vec3(0.1f, 30.0f, 100.0f);
+	glm::vec3 position_ =  glm::vec3(0.45f, 30.0f, 100.45f);
 	float velocity_ = 0.0f;
 	float gravity_ = -9.81f;
 	float timeDiff_ = 0.0f;

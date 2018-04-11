@@ -150,12 +150,18 @@ MatrixPointers GUI::getMatrixPointers() const
 
 void GUI::doJump(){
 	minecraft_character->jump();
-	eye_ = minecraft_character->getCharacterPosition();
+	eye_.y = minecraft_character->getCharacterPosition().y;
 }
 
 bool GUI::captureWASDUPDOWN(int key, int action)
 {
 	if (key == GLFW_KEY_W && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
+		if(action == GLFW_PRESS){
+			w_pressed_ = true;
+		}
+		if(action == GLFW_RELEASE){
+			w_pressed_ = false;
+		}
 		//std::cout << glm::to_string(eye_) << "\n";
 		if(loading_mode_){
 			//MOVE CHARACTER FORWARD
@@ -172,6 +178,12 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		
 		return true;
 	} else if (key == GLFW_KEY_S && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
+		if(action == GLFW_PRESS){
+			s_pressed_ = true;
+		}
+		if(action == GLFW_RELEASE){
+			s_pressed_ = false;
+		}
 		if(loading_mode_){
 			//MOVE CHARACTER BACKWARD
 			glm::vec3 tmp_look = glm::vec3(look_.x, 0.0f, look_.z);
@@ -187,6 +199,12 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		
 		return true;
 	} else if (key == GLFW_KEY_A && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
+		if(action == GLFW_PRESS){
+			a_pressed_ = true;
+		}
+		if(action == GLFW_RELEASE){
+			a_pressed_ = false;
+		}
 		if(loading_mode_){
 			//STRAFE CHARACTER
 			glm::vec3 eye_move  = - pan_speed_ * tangent_;
@@ -201,6 +219,12 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		
 		return true;
 	} else if (key == GLFW_KEY_D && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
+		if(action == GLFW_PRESS){
+			d_pressed_ = true;
+		}
+		if(action == GLFW_RELEASE){
+			d_pressed_ = false;
+		}
 		if(loading_mode_){
 			//STRAFE CHARACTER
 			glm::vec3 eye_move  = pan_speed_ * tangent_;
@@ -241,31 +265,37 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 	return false;
 }
 
+void GUI::setJumpingCharacterHeight(glm::vec3 eye_move){
+	float next_y_coord = terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z);
+	eye_ += eye_move;
+	minecraft_character->position_y_ = (1.75f + next_y_coord);
+}
 
 bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
 	float current_y_coord = eye_.y - 1.75f;
 	float next_y_coord = terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z);
 
 	float max = next_y_coord;
-	std::cout << "Direction I want to move" << glm::to_string(eye_move) << "\n";
+	// std::cout << "Current eye" << glm::to_string(eye_) << "\n";
+	// std::cout << "Direction I want to move" << glm::to_string(eye_move) << "\n";
  	if(eye_move.x < 0.0){
-		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x - 0.5, eye_.z + eye_move.z));
+		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x - 0.4, eye_.z + eye_move.z));
 	}
 	else if (eye_move.x > 0.0) {
-		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x + 0.5, eye_.z + eye_move.z));
+		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x + 0.4, eye_.z + eye_move.z));
 	}
 	if(eye_move.z < 0.0){
-		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z - 0.5));	
+		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z - 0.4));	
 	}
 	else if (eye_move.z > 0.0){
-		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z + 0.5));	
+		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z + 0.4));	
 	}
 	
 
 
-	std::cout << "CURRENT y position: " << current_y_coord << "\n";
-	std::cout << "NEXT y position: " << next_y_coord << "\n";
-	std::cout << "radius y position: " << max << "\n";
+	// std::cout << "CURRENT y position: " << current_y_coord << "\n";
+	// std::cout << "NEXT y position: " << next_y_coord << "\n";
+	// std::cout << "radius y position: " << max << "\n";
 
 	if(next_y_coord > current_y_coord){
 		return false;
@@ -280,8 +310,10 @@ bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
 			eye_ += eye_move;
 			eye_.y = 1.75f + next_y_coord;
 		} else {
+			// std::cout << "jumping" << "\n";
 			eye_ += eye_move;
-			minecraft_character->position_y_ = 1.75f + next_y_coord;
+			minecraft_character->setJumping(1.75f + next_y_coord);
+			//minecraft_character->position_y_ = 1.75f + next_y_coord;
 		}
 		return true;
 	}

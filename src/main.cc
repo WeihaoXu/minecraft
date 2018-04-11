@@ -279,6 +279,30 @@ int main(int argc, char* argv[])
 		}
 
 		if(gui.isCharacterJumping()){
+			if(gui.isWpressed()){
+				// std::cout << "MOVING JUMP" << "\n";	
+				glm::vec3 tmp_look = gui.getLook();
+				tmp_look.y = 0.0f;
+				glm::vec3 eye_move = gui.getZoomSpeed() * tmp_look;
+				gui.setJumpingCharacterHeight(eye_move);			
+			}
+			else if(gui.isSpressed()){
+				// std::cout << "MOVING JUMP" << "\n";	
+				glm::vec3 tmp_look = gui.getLook();
+				tmp_look.y = 0.0f;
+				glm::vec3 eye_move = -gui.getZoomSpeed() * tmp_look;
+				gui.setJumpingCharacterHeight(eye_move);			
+			}
+			else if(gui.isApressed()){
+				// std::cout << "MOVING JUMP" << "\n";	
+				glm::vec3 eye_move = -gui.getPanSpeed() * gui.getTangent();
+				gui.setJumpingCharacterHeight(eye_move);			
+			}
+			else if(gui.isDpressed()){
+				// std::cout << "MOVING JUMP" << "\n";	
+				glm::vec3 eye_move = gui.getPanSpeed() * gui.getTangent();
+				gui.setJumpingCharacterHeight(eye_move);			
+			}
 			gui.doJump();
 		}
 

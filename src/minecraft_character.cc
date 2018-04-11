@@ -7,8 +7,8 @@ void MinecraftCharacter::setJumping(float y_coord) {
 	is_jumping_ = true;
 	position_y_ = 1.75f + y_coord; //position_.y;
 	// std::cout << position_y_ << "\n";
-	if(jump_height < 2.0f){
-		jump_height += 2.0f;
+	if(jump_height < 1.0f){
+		jump_height += 1.0f;
 		timeDiff_ = toc(&timer);
 		move_up = true;
 	}
