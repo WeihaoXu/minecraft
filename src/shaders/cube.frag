@@ -222,7 +222,7 @@ void main()
     } 
   }
   else if(cube_type < TYPE_DIRT + eps) {
-    fragment_color = vec4(generateDirtColor(world_position).xyz * 0.3, 1.0);
+    fragment_color = vec4(generateDirtColor(world_position).xyz * 0.5, 1.0);
   }
   else if(cube_type < TYPE_STONE + eps) {
     fragment_color = generateStoneColor(world_position);
