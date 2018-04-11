@@ -58,15 +58,15 @@ private:
 	bool pose_changed_ = true;
 	bool transparent_ = false;
 	// int current_bone_ = -1;
-	bool loading_mode_ = false;
+	bool loading_mode_ = true;
 
 	int current_button_ = -1;
 	float roll_speed_ = M_PI / 64.0f * 5;
 	float last_x_ = 0.0f, last_y_ = 0.0f, current_x_ = 0.0f, current_y_ = 0.0f;
 	float camera_distance_ = 30.0;
-	float pan_speed_ = 0.1f * 5;
+	float pan_speed_ = 0.33f; // * 5;
 	float rotation_speed_ = 0.02f;
-	float zoom_speed_ = 0.1f * 5;
+	float zoom_speed_ = 0.33f; //0.1f * 5;
 	float aspect_;
 
 	// glm::vec3 eye_ = glm::vec3(0.0f, 0.1f, camera_distance_);
@@ -83,7 +83,7 @@ private:
 	glm::mat4 model_matrix_ = glm::mat4(1.0f);
 
 	bool captureWASDUPDOWN(int key, int action);
-	bool setCharacterHeightToTerrain();
+	bool setCharacterHeightToTerrain(glm::vec3 eye_move);
 
 };
 

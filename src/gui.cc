@@ -71,7 +71,7 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		if(loading_mode_){
 			minecraft_character->timer = tic();
 			eye_ = minecraft_character->getCharacterPosition();
-			setCharacterHeightToTerrain();
+			setCharacterHeightToTerrain(glm::vec3(0,0,0));
 		}
 	}
 }
@@ -160,10 +160,8 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		if(loading_mode_){
 			//MOVE CHARACTER FORWARD
 			glm::vec3 tmp_look = glm::vec3(look_.x, 0.0f, look_.z);
-			eye_ += zoom_speed_ * tmp_look;
-			if(!setCharacterHeightToTerrain()){
-				eye_ -= zoom_speed_ * tmp_look;
-			}
+			glm::vec3 eye_move = zoom_speed_ * tmp_look;
+			setCharacterHeightToTerrain(eye_move);
 		} else if (fps_mode_){
 			eye_ += zoom_speed_ * look_;
 		} else{
@@ -177,10 +175,8 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		if(loading_mode_){
 			//MOVE CHARACTER BACKWARD
 			glm::vec3 tmp_look = glm::vec3(look_.x, 0.0f, look_.z);
-			eye_ -= zoom_speed_ * tmp_look;
-			if(!setCharacterHeightToTerrain()){
-				eye_ += zoom_speed_ * tmp_look;
-			}
+			glm::vec3 eye_move  = -zoom_speed_ * tmp_look;
+			setCharacterHeightToTerrain(eye_move);
 		} else if (fps_mode_){
 			eye_ -= zoom_speed_ * look_;
 		} else {
@@ -193,10 +189,8 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 	} else if (key == GLFW_KEY_A && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
 		if(loading_mode_){
 			//STRAFE CHARACTER
-			eye_ -= pan_speed_ * tangent_;
-			if(!setCharacterHeightToTerrain()){
-				eye_ += pan_speed_ * tangent_;
-			}
+			glm::vec3 eye_move  = - pan_speed_ * tangent_;
+			setCharacterHeightToTerrain(eye_move);
 		} else if (fps_mode_){
 			eye_ -= pan_speed_ * tangent_;
 		} else{
@@ -209,10 +203,8 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 	} else if (key == GLFW_KEY_D && (!minecraft_character->isJumping() || action == GLFW_PRESS)) {
 		if(loading_mode_){
 			//STRAFE CHARACTER
-			eye_ += pan_speed_ * tangent_;
-			if(!setCharacterHeightToTerrain()){
-				eye_ -= pan_speed_ * tangent_;
-			}
+			glm::vec3 eye_move  = pan_speed_ * tangent_;
+			setCharacterHeightToTerrain(eye_move);
 		} else if (fps_mode_){
 			eye_ += pan_speed_ * tangent_;
 		} else {
@@ -250,29 +242,49 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 }
 
 
-bool GUI::setCharacterHeightToTerrain(){
-	float y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
+bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
+	float current_y_coord = eye_.y - 1.75f;
+	float next_y_coord = terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z);
 
-	float max = y_coord;
-	max = fmax(max, terrain_generator_->getHeight(eye_.x + 0.5, eye_.z));
-	max = fmax(max, terrain_generator_->getHeight(eye_.x - 0.5, eye_.z));
-	max = fmax(max, terrain_generator_->getHeight(eye_.x, eye_.z + 0.5));
-	max = fmax(max, terrain_generator_->getHeight(eye_.x, eye_.z - 0.5));
+	float max = next_y_coord;
+	std::cout << "Direction I want to move" << glm::to_string(eye_move) << "\n";
+ 	if(eye_move.x < 0.0){
+		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x - 0.5, eye_.z + eye_move.z));
+	}
+	else if (eye_move.x > 0.0) {
+		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x + 0.5, eye_.z + eye_move.z));
+	}
+	if(eye_move.z < 0.0){
+		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z - 0.5));	
+	}
+	else if (eye_move.z > 0.0){
+		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z + 0.5));	
+	}
+	
 
-	if(max < 0){
+
+	std::cout << "CURRENT y position: " << current_y_coord << "\n";
+	std::cout << "NEXT y position: " << next_y_coord << "\n";
+	std::cout << "radius y position: " << max << "\n";
+
+	if(next_y_coord > current_y_coord){
+		return false;
+	} else if (next_y_coord < 0){
+		return false;
+	} 
+	else if (max > next_y_coord && max > current_y_coord){
 		return false;
 	}
-	if(! minecraft_character->isJumping()){
-		if(max > y_coord && eye_.y < (1.75f + max)){
-			return false;
-			//minecraft_character->setJumping(max);
+	else {
+		if(!minecraft_character->isJumping()){
+			eye_ += eye_move;
+			eye_.y = 1.75f + next_y_coord;
+		} else {
+			eye_ += eye_move;
+			minecraft_character->position_y_ = 1.75f + next_y_coord;
 		}
-		eye_.y = 1.75f + max;
-	} else {
-		minecraft_character->position_y_ = 1.75f + max;
+		return true;
 	}
-	minecraft_character->setCharacterPosition(eye_);
-	return true;
 }
 
 
