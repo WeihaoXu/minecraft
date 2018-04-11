@@ -45,9 +45,9 @@ bool TerrainGenerator::generateHeightMap()
 	int curr_grid_shift_x = grid_center_x - origin_grid_center_x;
 	int curr_grid_shift_z = grid_center_z - origin_grid_center_z;
 	
-	std::cout << "current camera: " << grid_center_x << ", " << grid_center_z
-				<< "  modify map value: " << modify_map_contains(grid_center_x, grid_center_z)
-				<< std::endl;
+	// std::cout << "current camera: " << grid_center_x << ", " << grid_center_z
+	// 			<< "  modify map value: " << modify_map_contains(grid_center_x, grid_center_z)
+	// 			<< std::endl;
 
 	if(curr_grid_shift_x == grid_shift_x_ && curr_grid_shift_z == grid_shift_z_ && !cube_positions.empty()) {	// no need to update
 		return false;
@@ -84,7 +84,7 @@ void TerrainGenerator::generateCubes() {
 
 	
 	// cube_positions.clear();
-	cube_positions = std::vector<glm::vec4>();
+	cube_positions.clear();
 	for(int grid_x = 0; grid_x < x_size_; grid_x++) {
 		for(int grid_z = 0; grid_z < z_size_; grid_z++) {
 			int top_grid_y = height_map_[grid_x][grid_z];
@@ -102,6 +102,9 @@ void TerrainGenerator::generateCubes() {
 			}
 			else if(top_grid_y >= perlin_height_amp_ * 0.8) {
 				cube_type = CubeType::STONE;
+			}
+			else if(top_grid_y % 3 == 0){
+				cube_type = CubeType::DIRT;
 			}
 			else {
 				cube_type = CubeType::DIRT_GRASS;
