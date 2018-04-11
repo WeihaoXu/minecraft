@@ -9,6 +9,7 @@
 #include "terrain_generator.h"
 #include "perlin.h"
 #include "perm_texture.hpp"
+#include "tictoc.h"
 
 #include <algorithm>
 #include <fstream>
@@ -194,6 +195,10 @@ int main(int argc, char* argv[])
 	auto sky_offset_data = [&terrain_generator]() -> const void* {
 		return (const void*) &terrain_generator.sky_offset[0];
 	};
+	float timePassed = 0.0;
+	auto time_passed_data = [&timePassed]() -> const void* {
+		return &timePassed;
+	};
 
 
 	// FIXME: add more lambdas for data_source if you want to use RenderPass.
@@ -210,7 +215,7 @@ int main(int argc, char* argv[])
 	ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
 	ShaderUniform perm_texture = {"perm_texture", texture0_binder, texture_data};
 	ShaderUniform sky_offset = {"sky_offset", vector3_binder, sky_offset_data};
-
+	ShaderUniform time_pass = { "day_time", float_binder, time_passed_data};
 
 	// sky render pass
 	RenderDataInput sky_pass_input;
@@ -220,7 +225,7 @@ int main(int argc, char* argv[])
 	RenderPass sky_pass(-1,
 			sky_pass_input,
 			{sky_vertex_shader, sky_geometry_shader, sky_fragment_shader},
-			{cube_model, std_view, std_proj, perm_texture, sky_offset},
+			{cube_model, std_view, std_proj, perm_texture, sky_offset, time_pass},
 			{"fragment_color"}
 			);
 
@@ -246,6 +251,8 @@ int main(int argc, char* argv[])
 	
 	bool draw_floor = true;
 	bool draw_cube = true;
+	TicTocTimer timer = tic();
+	float timeDiff = 0.0f;
 
 	while (!glfwWindowShouldClose(window)) {
 		// Setup some basic window stuff.
@@ -314,7 +321,7 @@ int main(int argc, char* argv[])
 			gui.doJump();
 		}
 
-		{
+		if(draw_cube) {
 			glVertexAttribDivisor(3, 1);
 			cube_pass.setup();
 			cube_pass.updateVBO(3, 
@@ -326,7 +333,23 @@ int main(int argc, char* argv[])
 					                              terrain_generator.cube_positions.size()));
 		}
 
-		{
+		if(draw_floor) {
+			timeDiff += toc(&timer);
+			if(timeDiff > 21.0f){
+				timePassed = 0.0f;
+				timeDiff = 0.0f;
+			}
+			if(timeDiff < 8.0f){
+				timePassed = 0.0f;
+			} else if (timeDiff < 10.0f){
+				timePassed = 1.0f;
+			} else if (timeDiff < 18.0f){
+				timePassed = 2.0f;
+			} else {
+				timePassed = 3.0f;
+			}
+			// std::cout << timeDiff << "\n";
+			// std::cout << timePassed << "\n";
 			sky_pass.setup();
 			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
 			                              terrain_generator.sky_cube_faces.size() * 3,
