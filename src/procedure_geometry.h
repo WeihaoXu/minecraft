@@ -10,8 +10,11 @@ void create_cube(std::vector<glm::vec4>& cube_vertices,
 					std::vector<glm::uvec3>& cube_faces,
 					std::vector<glm::vec4>& cube_normals);
 
-void generate_cube(float cube_width, std::vector<glm::vec4>& cube_vertices,
+void generate_unit_cube(float cube_width, std::vector<glm::vec4>& cube_vertices,
 	std::vector<glm::vec4>& cube_normals, std::vector<glm::uvec3>& cube_faces, std::vector<glm::vec2> &cube_uv);
 
 void create_offsets(std::vector<glm::vec3>& offsets);
+
+void generate_unit_cube_inside_out(float cube_width, std::vector<glm::vec4>& cube_vertices, 
+								std::vector<glm::uvec3>& cube_faces);
 #endif

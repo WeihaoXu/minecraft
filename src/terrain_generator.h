@@ -15,6 +15,8 @@ public:
 
 	bool updateTerrain(glm::vec3 camera_position);
 	float getHeight(float pos_x, float pos_z);
+	glm::vec3 sky_offset = glm::vec3(0.0, 0.0, 0.0);	
+	// glm::vec3* getSkyOffsetPointer() {return &sky_offset_;};
 
 	std::vector<glm::vec4> cube_vertices;
 	std::vector<glm::uvec3> cube_faces;
@@ -22,10 +24,13 @@ public:
 	std::vector<glm::vec4> cube_normals;
 	std::vector<glm::vec2> cube_uvs;
 
+	std::vector<glm::vec4> sky_cube_vertices;
+	std::vector<glm::uvec3> sky_cube_faces;
+
 private:
 	Perlin perlin_;
 	// void addCube(glm::vec3 grid_coord);
-	void generateUnitCube();
+	void generateUnitCubes();
 	bool generateHeightMap();	// compute height map based on camera position
 	void generateCubes();	// generate the positions of cubes to render based on height map.
 	
@@ -39,7 +44,8 @@ private:
 
 	float perlin_freq_ = 0.0323; // adjust frequency of perlin noise
 	int perlin_height_amp_ = 5;	// adjust amplitude of perlin noise 
-	glm::vec3 camera_position_;	
+	glm::vec3 camera_position_;
+	
 
 };
 
