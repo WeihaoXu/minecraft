@@ -275,10 +275,15 @@ int main(int argc, char* argv[])
 			// std::cout << std::endl;
 			// std::cout << "grid[0][0] position = " << glm::to_string(terrain_generator.cube_positions[0]) <<"\n";
 			// std::cout << "sky position = " << glm::to_string(terrain_generator.sky_offset) <<"\n";
-			for(int i = 0; i < 1000; i++) {
-				std::cout << "cube type: " << (int) terrain_generator.cube_positions[i].w << std::endl;
-			}
+			// for(int i = 0; i < 1000; i++) {
+			// 	std::cout << "cube type: " << (int) terrain_generator.cube_positions[i].w << std::endl;
+			// }
 			gui.clearPose();
+		}
+
+		if(gui.isTerrainModified()) {
+			terrain_generator.generateCubes();
+			gui.clearTerrainModify();
 		}
 
 		if(gui.isCharacterJumping()){
