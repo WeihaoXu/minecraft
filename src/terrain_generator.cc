@@ -102,7 +102,7 @@ void TerrainGenerator::generateCubes() {
 			else if(top_grid_y < 0) {
 				cube_type = CubeType::WATER;
 			}
-			else if(top_grid_y >= perlin_height_amp_ * 0.8) {
+			else if(top_grid_y >= perlin_height_amp_ * 0.5) {
 				cube_type = CubeType::STONE;
 			}
 			else if(top_grid_y % 3 == 0){
