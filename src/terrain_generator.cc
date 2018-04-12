@@ -274,6 +274,15 @@ float TerrainGenerator::getHeight(float pos_x, float pos_z) {
 	return grid_y * cube_width_;
 }
 
+
+bool TerrainGenerator::isWater(float pos_x, float pos_z) {
+	int grid_x = std::floor(pos_x / cube_width_) - grid_shift_x_;
+	int grid_z = std::floor(pos_z / cube_width_) - grid_shift_z_;
+	int grid_y = height_map_[grid_x][grid_z];
+	return (grid_y < 0 && !modify_map_contains(grid_x + grid_shift_x_, grid_z + grid_shift_z_));	// because deleteCube may cause height = -1
+}
+
+
 bool TerrainGenerator::modify_map_contains(int grid_x, int grid_z) {
 	if(modify_map_.find(grid_x) == modify_map_.end()
 				|| modify_map_[grid_x].find(grid_z) == modify_map_[grid_x].end()) {

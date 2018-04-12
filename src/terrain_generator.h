@@ -23,6 +23,8 @@ public:
 
 
 	float getHeight(float pos_x, float pos_z);
+	bool isWater(float pos_x, float pos_z);
+
 	float getXSize() const {return x_size_;}
 	float getZSize() const {return z_size_;};
 	glm::vec3 sky_offset = glm::vec3(0.0, 0.0, 0.0);
