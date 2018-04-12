@@ -155,7 +155,7 @@ void TerrainGenerator::generateCubes() {
 			int shifted_grid_x = modify_grid_x - grid_shift_x_;
 			int shifted_grid_z = modify_grid_z - grid_shift_z_;
 			if(shifted_grid_x < 0 || shifted_grid_z < 0 || shifted_grid_x >= x_size_ || grid_shift_z_ > z_size_) continue;
-			height_map_[shifted_grid_x][shifted_grid_z] += modify_value;
+			height_map_[shifted_grid_x][shifted_grid_z] -= modify_value;
 		}
 	}
 
@@ -270,6 +270,7 @@ float TerrainGenerator::getHeight(float pos_x, float pos_z) {
 	int grid_y = height_map_[grid_x][grid_z];
 	if(modify_map_contains(grid_x + grid_shift_x_, grid_z + grid_shift_z_)) {
 		grid_y += modify_map_[grid_x + grid_shift_x_][grid_z + grid_shift_z_];
+		// std::cout << "modified height: " << modify_map_[grid_x + grid_shift_x_][grid_z + grid_shift_z_] << std::endl;
 	}
 	return grid_y * cube_width_;
 }

@@ -310,8 +310,10 @@ int main(int argc, char* argv[])
 			// for(int i = 0; i < 1000; i++) {
 			// 	std::cout << "cube type: " << (int) terrain_generator.cube_positions[i].w << std::endl;
 			// }
+
 			gui.clearPose();
 		}
+		std::cout << "curent height: " << terrain_generator.getHeight(gui.getCamera().x, gui.getCamera().z) << std::endl;
 	
 		if(gui.isTerrainModified()) {
 			terrain_generator.generateHeightMap();
