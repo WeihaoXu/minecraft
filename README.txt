@@ -16,6 +16,6 @@ in a parabolic motion above the camera. The sky box is interpolated in the
 fragment shader to get a horizon and to gradually move from day to night.
 
 2. The user can make modifications to the world by pressing 'R' to remove
-boxes from the world, and by pressing 'T' to add boxes. 
+boxes from the world, and by pressing 'T' to add boxes. The user can walk into the holes digged, and jump up to the new boxes added.
 
 3.Water (You can not walk/jump in/jump over water)
