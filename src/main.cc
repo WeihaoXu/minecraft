@@ -54,6 +54,10 @@ const char* sky_fragment_shader =
 #include "shaders/sky.frag"
 ;
 
+// const char* horizon_fragment_shader =
+// #include "shaders/horizon.frag"
+// ;
+
 
 
 const char* cube_vertex_shader =
@@ -229,6 +233,17 @@ int main(int argc, char* argv[])
 			{"fragment_color"}
 			);
 
+	// RenderDataInput horizon_pass_input;
+	// horizon_pass_input.assign(0, "vertex_position", terrain_generator.horizon_cube_vertices.data(), terrain_generator.horizon_cube_vertices.size(), 4, GL_FLOAT);
+	// horizon_pass_input.assignIndex(terrain_generator.horizon_cube_faces.data(), terrain_generator.horizon_cube_faces.size(), 3);
+	
+	// RenderPass horizon_pass(-1,
+	// 		horizon_pass_input,
+	// 		{sky_vertex_shader, sky_geometry_shader, horizon_fragment_shader},
+	// 		{cube_model, std_view, std_proj, perm_texture, sky_offset, time_pass},
+	// 		{"fragment_color"}
+	// 		);
+
 
 
 	// Cube render pass
@@ -299,26 +314,60 @@ int main(int argc, char* argv[])
 				glm::vec3 tmp_look = gui.getLook();
 				tmp_look.y = 0.0f;
 				glm::vec3 eye_move = gui.getZoomSpeed() * tmp_look;
-				gui.setJumpingCharacterHeight(eye_move);			
+				gui.setJumpingCharacterHeight(eye_move);
+				gui.setPoseDirty();				
 			}
 			else if(gui.isSpressed()){
 				// std::cout << "MOVING JUMP" << "\n";	
 				glm::vec3 tmp_look = gui.getLook();
 				tmp_look.y = 0.0f;
 				glm::vec3 eye_move = -gui.getZoomSpeed() * tmp_look;
-				gui.setJumpingCharacterHeight(eye_move);			
+				gui.setJumpingCharacterHeight(eye_move);
+				gui.setPoseDirty();			
 			}
 			else if(gui.isApressed()){
 				// std::cout << "MOVING JUMP" << "\n";	
 				glm::vec3 eye_move = -gui.getPanSpeed() * gui.getTangent();
-				gui.setJumpingCharacterHeight(eye_move);			
+				gui.setJumpingCharacterHeight(eye_move);
+				gui.setPoseDirty();
+				gui.setPoseDirty();			
 			}
 			else if(gui.isDpressed()){
 				// std::cout << "MOVING JUMP" << "\n";	
 				glm::vec3 eye_move = gui.getPanSpeed() * gui.getTangent();
-				gui.setJumpingCharacterHeight(eye_move);			
+				gui.setJumpingCharacterHeight(eye_move);
+				gui.setPoseDirty();			
 			}
 			gui.doJump();
+		} else if(gui.isInLoadingMode()){
+			if(gui.isWpressed()){
+				// std::cout << "MOVING JUMP" << "\n";	
+				glm::vec3 tmp_look = gui.getLook();
+				tmp_look.y = 0.0f;
+				glm::vec3 eye_move = gui.getZoomSpeed() * tmp_look;
+				gui.setCharacterHeightToTerrain(eye_move);
+				gui.setPoseDirty();	
+			}
+			else if(gui.isSpressed()){
+				// std::cout << "MOVING JUMP" << "\n";	
+				glm::vec3 tmp_look = gui.getLook();
+				tmp_look.y = 0.0f;
+				glm::vec3 eye_move = -gui.getZoomSpeed() * tmp_look;
+				gui.setCharacterHeightToTerrain(eye_move);
+				gui.setPoseDirty();		
+			}
+			else if(gui.isApressed()){
+				// std::cout << "MOVING JUMP" << "\n";	
+				glm::vec3 eye_move = -gui.getPanSpeed() * gui.getTangent();
+				gui.setCharacterHeightToTerrain(eye_move);
+				gui.setPoseDirty();			
+			}
+			else if(gui.isDpressed()){
+				// std::cout << "MOVING JUMP" << "\n";	
+				glm::vec3 eye_move = gui.getPanSpeed() * gui.getTangent();
+				gui.setCharacterHeightToTerrain(eye_move);
+				gui.setPoseDirty();	
+			}
 		}
 
 		if(draw_cube) {
@@ -350,6 +399,10 @@ int main(int argc, char* argv[])
 			}
 			// std::cout << timeDiff << "\n";
 			// std::cout << timePassed << "\n";
+			// horizon_pass.setup();
+			// CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
+			//                               terrain_generator.horizon_cube_faces.size() * 3,
+			//                               GL_UNSIGNED_INT, 0));
 			sky_pass.setup();
 			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
 			                              terrain_generator.sky_cube_faces.size() * 3,

@@ -57,9 +57,6 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		else
 			roll_speed = roll_speed_;
 		// FIXME: actually roll the bone here
-	} else if (key == GLFW_KEY_C && action != GLFW_RELEASE) {
-		fps_mode_ = !fps_mode_;
-		std::cout << "toggle fps_mode_, current: " << fps_mode_ << std::endl;
 	} else if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_RELEASE) {
 
 	} else if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_RELEASE) {
@@ -70,8 +67,10 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		loading_mode_ = !loading_mode_;
 		if(loading_mode_){
 			minecraft_character->timer = tic();
-			eye_ = minecraft_character->getCharacterPosition();
-			setCharacterHeightToTerrain(glm::vec3(0,0,0));
+			setInitCharacterHeight();
+			setPoseDirty();
+			// eye_ = minecraft_character->getCharacterPosition();
+			// setCharacterHeightToTerrain(glm::vec3(0,0,0));
 		}
 	} else if(key == GLFW_KEY_R && action == GLFW_PRESS) {
 		if(loading_mode_) {
@@ -123,15 +122,13 @@ void GUI::mouseButtonCallback(int button, int action, int mods)
 void GUI::updateMatrices()
 {
 	// Compute our view, and projection matrices.
-	if(loading_mode_){
+	if(isInLoadingMode()){
 		up_ = glm::vec3(0.0f, 1.0f, 0.0f);
 		center_ = eye_ + camera_distance_ * look_;
 	}
-	else if (fps_mode_){
+	else 
+	{
 		center_ = eye_ + camera_distance_ * look_;
-	}
-	else{
-		eye_ = center_ - camera_distance_ * look_;
 	}
 
 	view_matrix_ = glm::lookAt(eye_, center_, up_);
@@ -167,19 +164,11 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		if(action == GLFW_RELEASE){
 			w_pressed_ = false;
 		}
-		//std::cout << glm::to_string(eye_) << "\n";
-		if(loading_mode_){
-			//MOVE CHARACTER FORWARD
-			glm::vec3 tmp_look = glm::vec3(look_.x, 0.0f, look_.z);
-			glm::vec3 eye_move = zoom_speed_ * tmp_look;
-			setCharacterHeightToTerrain(eye_move);
-		} else if (fps_mode_){
-			eye_ += zoom_speed_ * look_;
-		} else{
-			camera_distance_ -= zoom_speed_;
-		}
 		
-		pose_changed_ = true;
+		if(!isInLoadingMode()){
+			eye_ += zoom_speed_ * look_;
+		}
+		setPoseDirty();
 		
 		return true;
 	} else if (key == GLFW_KEY_S) {
@@ -189,18 +178,12 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		if(action == GLFW_RELEASE){
 			s_pressed_ = false;
 		}
-		if(loading_mode_){
-			//MOVE CHARACTER BACKWARD
-			glm::vec3 tmp_look = glm::vec3(look_.x, 0.0f, look_.z);
-			glm::vec3 eye_move  = -zoom_speed_ * tmp_look;
-			setCharacterHeightToTerrain(eye_move);
-		} else if (fps_mode_){
+
+		if(!isInLoadingMode()){
 			eye_ -= zoom_speed_ * look_;
-		} else {
-			camera_distance_ += zoom_speed_;
 		}
 		
-		pose_changed_ = true;
+		setPoseDirty();
 		
 		return true;
 	} else if (key == GLFW_KEY_A) {
@@ -210,17 +193,12 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		if(action == GLFW_RELEASE){
 			a_pressed_ = false;
 		}
-		if(loading_mode_){
-			//STRAFE CHARACTER
-			glm::vec3 eye_move  = - pan_speed_ * tangent_;
-			setCharacterHeightToTerrain(eye_move);
-		} else if (fps_mode_){
+
+		if(!isInLoadingMode()){
 			eye_ -= pan_speed_ * tangent_;
-		} else{
-			center_ -= pan_speed_ * tangent_;
 		}
 
-		pose_changed_ = true;
+		setPoseDirty();
 		
 		return true;
 	} else if (key == GLFW_KEY_D) {
@@ -230,39 +208,34 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 		if(action == GLFW_RELEASE){
 			d_pressed_ = false;
 		}
-		if(loading_mode_){
-			//STRAFE CHARACTER
-			glm::vec3 eye_move  = pan_speed_ * tangent_;
-			setCharacterHeightToTerrain(eye_move);
-		} else if (fps_mode_){
+		if(!isInLoadingMode()){
 			eye_ += pan_speed_ * tangent_;
-		} else {
-			center_ += pan_speed_ * tangent_;
 		}
 		
-		pose_changed_ = true;
+		setPoseDirty();
 		
 		return true;
 	} else if (key == GLFW_KEY_DOWN) {
-		if(loading_mode_){
+		if(isInLoadingMode()){
 			return false;
-		} if (fps_mode_)
+		}
+		else {
 			eye_ -= pan_speed_ * up_;
-		else
-			center_ -= pan_speed_ * up_;
+		}
 		
-		pose_changed_ = true;
+		setPoseDirty();
 		
 		return true;
 	} else if (key == GLFW_KEY_UP) {
-		if(loading_mode_){
+
+		if(isInLoadingMode()){
 			return false;
-		} if (fps_mode_)
+		}
+		else {
 			eye_ += pan_speed_ * up_;
-		else
-			center_ += pan_speed_ * up_;
+		}
 		
-		pose_changed_ = true;
+		setPoseDirty();
 		
 		return true;
 	}
@@ -274,6 +247,11 @@ void GUI::setJumpingCharacterHeight(glm::vec3 eye_move){
 	float next_y_coord = terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z);
 	eye_ += eye_move;
 	minecraft_character->position_y_ = (1.75f + next_y_coord);
+}
+
+void GUI::setInitCharacterHeight(){
+	float next_y_coord = terrain_generator_->getHeight(eye_.x, eye_.z);
+	eye_.y = (1.75f + next_y_coord);
 }
 
 bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
@@ -297,7 +275,6 @@ bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
 	}
 	
 
-
 	// std::cout << "CURRENT y position: " << current_y_coord << "\n";
 	// std::cout << "NEXT y position: " << next_y_coord << "\n";
 	// std::cout << "radius y position: " << max << "\n";
@@ -311,15 +288,8 @@ bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
 		return false;
 	}
 	else {
-		if(!minecraft_character->isJumping()){
-			eye_ += eye_move;
-			eye_.y = 1.75f + next_y_coord;
-		} else {
-			// std::cout << "jumping" << "\n";
-			eye_ += eye_move;
-			minecraft_character->setJumping(1.75f + next_y_coord);
-			//minecraft_character->position_y_ = 1.75f + next_y_coord;
-		}
+		eye_ += eye_move;
+		eye_.y = 1.75f + next_y_coord;
 		return true;
 	}
 }
