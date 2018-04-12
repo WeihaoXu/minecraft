@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
 
 			gui.clearPose();
 		}
-		std::cout << "curent height: " << terrain_generator.getHeight(gui.getCamera().x, gui.getCamera().z) << std::endl;
+		// std::cout << "curent height: " << terrain_generator.getHeight(gui.getCamera().x, gui.getCamera().z) << std::endl;
 	
 		if(gui.isTerrainModified()) {
 			terrain_generator.generateHeightMap();
