@@ -1,5 +1,8 @@
 #include "perlin.h"
 
+// The implementation is based on Perlin's Java implementation of 3D noise: https://cs.nyu.edu/~perlin/noise/
+// I write and use the 2D version to generate terrains.
+
 Perlin::Perlin() {
 	int permutation[256] = { 151,160,137,91,90,15,
 	131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
@@ -21,10 +24,39 @@ Perlin::Perlin() {
 	}
 }
 
+
+double Perlin::noise2D(double x, double z) {
+
+	int X = (int) floor(x) & 255;
+	int Z = (int) floor(z) & 255;
+
+	x -= floor(x);
+	z -= floor(z);
+
+	double u = fade(x);
+	double w = fade(z);
+
+	int A = p[X] + Z;
+	int B = p[X + 1] + Z;
+
+	float noise_x0 = lerp(u, grad2D(p[A], x, z), grad2D(p[B], x - 1, z));
+	float noise_x1 = lerp(u, grad2D(p[A + 1], x, z - 1), grad2D(p[B + 1], x - 1, z - 1));
+
+	float noise_z = lerp(w, noise_x0, noise_x1);
+	return noise_z;
+}
+
+
+
+
+
 double Perlin::noise3D(double x, double y, double z) {
+
+
 	int X = (int) floor(x) & 255;
 	int Y = (int) floor(y) & 255;
 	int Z = (int) floor(z) & 255;
+
 
 	x -= floor(x);
 	y -= floor(y);
@@ -34,16 +66,21 @@ double Perlin::noise3D(double x, double y, double z) {
 	double v = fade(y);
 	double w = fade(z);
 
-	int A = p[X  ]+Y, AA = p[A]+Z, AB = p[A+1]+Z,      // HASH COORDINATES OF
-    	B = p[X+1]+Y, BA = p[B]+Z, BB = p[B+1]+Z;      // THE 8 CUBE CORNERS,
-	return lerp(w, lerp(v, lerp(u, grad(p[AA  ], x  , y  , z   ),  // AND ADD
-		                             grad(p[BA  ], x-1, y  , z   )), // BLENDED
-		                     lerp(u, grad(p[AB  ], x  , y-1, z   ),  // RESULTS
-		                             grad(p[BB  ], x-1, y-1, z   ))),// FROM  8
-		             lerp(v, lerp(u, grad(p[AA+1], x  , y  , z-1 ),  // CORNERS
-		                             grad(p[BA+1], x-1, y  , z-1 )), // OF CUBE
-		                     lerp(u, grad(p[AB+1], x  , y-1, z-1 ),
-		                             grad(p[BB+1], x-1, y-1, z-1 ))));
+	int A = p[X  ]+Y, AA = p[A]+Z, AB = p[A+1]+Z;      // HASH COORDINATES OF
+    int	B = p[X+1]+Y, BA = p[B]+Z, BB = p[B+1]+Z;      // THE 8 CUBE CORNERS,
+
+   
+    float x00 = lerp(u, grad(p[AA  ], x  , y  , z   ),  grad(p[BA  ], x-1, y  , z   ));
+    float x01 = lerp(u, grad(p[AB  ], x  , y-1, z   ),  grad(p[BB  ], x-1, y-1, z   ));
+    float x10 = lerp(u, grad(p[AA+1], x  , y  , z-1 ), grad(p[BA+1], x-1, y  , z-1 ));
+    float x11 = lerp(u, grad(p[AB+1], x  , y-1, z-1 ), grad(p[BB+1], x-1, y-1, z-1 ));
+
+   	float y0 = lerp(v, x00, x01);
+   	float y1 = lerp(v, x10, x11);
+
+   	float res = lerp(w, y0, y1);
+
+   	return res;
 }
 
 
@@ -55,11 +92,22 @@ double Perlin::lerp(double t, double a, double b) {
 	return a + t * (b - a); 
 }
 
+
+// this function is actually dot(gradient, vec3(x, y, z))
 double Perlin::grad(int hash, double x, double y, double z) {
 	int h = hash & 15;                      // CONVERT LO 4 BITS OF HASH CODE
 	double u = h<8 ? x : y,                 // INTO 12 GRADIENT DIRECTIONS.
 	      v = h<4 ? y : h==12||h==14 ? x : z;
 	return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
+}
+
+double Perlin::grad2D(int hash, double x, double z) {
+	int h = hash & 4;
+	if(h == 0) return x + z;
+	if(h == 1) return x - z;
+	if(h == 2) return -x + z;
+	if(h == 3) return -x - z;
+
 }
 
 

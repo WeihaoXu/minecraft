@@ -12,9 +12,12 @@ public:
 	~Perlin();
 
 double noise3D(double x, double y, double z);
+double noise2D(double x, double z);
 double fade(double t);
 double lerp(double t, double a, double b);
 double grad(int hash, double x, double y, double z);
+
+double grad2D(int hash, double x, double z);
 
 
 

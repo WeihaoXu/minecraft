@@ -45,10 +45,11 @@ vec4 lerp4D(vec4 a, vec4 b, float t) {
 }
 
 float fade(float t) {
-  //return t*t*(3.0-2.0*t); // Old fade
   return t*t*t*(t*(t*6.0-15.0)+10.0); // Improved fade
 }
  
+// I followed this idea to pass in gradient vectors to GPU as textures: 
+// http://www.sci.utah.edu/~leenak/IndStudy_reportfall/MarbleCode.txt
 float perlinNoise(vec3 P)
 {
 
