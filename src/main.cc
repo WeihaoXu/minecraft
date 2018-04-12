@@ -396,6 +396,7 @@ int main(int argc, char* argv[])
 		if(draw_floor) {
 			if(gui.dayLightSpeedChanged()){
 				gui.resetDayLightSpeed();
+				std::cout << "It will take: " << 20 * gui.getDayLightSpeed() << " seconds to get through the day-night cycle\n";
 				totalTimeDifference = timeDiff * gui.getDayLightSpeed();
 			}
 			totalTimeDifference += toc(&timer);
