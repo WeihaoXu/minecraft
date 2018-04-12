@@ -67,8 +67,6 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 			day_light_speed_ += 1.0f;
 			change_day_light_speed_ = true;
 		}
-	} else if (key == GLFW_KEY_T && action != GLFW_RELEASE) {
-		transparent_ = !transparent_;
 	} else if ((key == GLFW_KEY_F && (mods & GLFW_MOD_CONTROL)) && action == GLFW_RELEASE) {
 		loading_mode_ = !loading_mode_;
 		if(loading_mode_){
@@ -84,7 +82,12 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 			terrain_generator_->deleteCube(eye_, look_);
 			terrain_modified = true;
 		}
-	}
+	} else if (key == GLFW_KEY_T && action == GLFW_PRESS) {
+		if(loading_mode_) {
+			terrain_generator_->addCube(eye_, look_);
+			terrain_modified = true;
+		}
+	} 
 }
 
 void GUI::mousePosCallback(double mouse_x, double mouse_y)
@@ -253,7 +256,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 
 void GUI::setJumpingCharacterHeight(glm::vec3 eye_move){
 	float next_y_coord = terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z);
-	if (next_y_coord < 0){
+	if (terrain_generator_->isWater(eye_.x + eye_move.x, eye_.z + eye_move.z)){
 		return;
 	} 
 	eye_ += eye_move;
@@ -374,9 +377,9 @@ bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
 
 	if(next_y_coord > current_y_coord){
 		return false;
-	} else if (next_y_coord < 0){
+	} else if (terrain_generator_->isWater(eye_.x + eye_move.x, eye_.z + eye_move.z)){
 		return false;
-	} 
+	}
 	else if (max > next_y_coord && max > current_y_coord){
 		return false;
 	}

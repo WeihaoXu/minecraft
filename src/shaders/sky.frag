@@ -53,7 +53,7 @@ float perlinNoise(vec3 P)
   
   // Noise contributions from (x=0, y=0), z=0 and z=1
   float perm00 = texture(perm_texture, Pi.xy).a ;
-  vec3  grad000 = texture(perm_texture, vec2(perm00, Pi.z)).rgb * 4.0 - 1.0;
+  vec3  grad000 = texture(perm_texture, vec2(perm00, Pi.z)).rgb * 4.0 - 1.0;  // scale 
   float n000 = dot(grad000, Pf);
   vec3  grad001 = texture(perm_texture, vec2(perm00, Pi.z + ONE)).rgb * 4.0 - 1.0;
   float n001 = dot(grad001, Pf - vec3(0.0, 0.0, 1.0));
