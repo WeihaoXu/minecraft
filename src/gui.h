@@ -66,6 +66,7 @@ public:
 
 	void doJump();
 	glm::vec3 getMinecraftCharacterPosition() const{ return minecraft_character->getCharacterPosition(); }
+	void setMinecraftCharacterPosition() {minecraft_character->setCharacterPosition(eye_); }
 	void updateMinecraftCharacterYcoordinate(float y_coord) {minecraft_character->setCharacterPosition(glm::vec3(eye_.x, y_coord, eye_.z));}
 
 	float getDayLightSpeed() const {return day_light_speed_;}

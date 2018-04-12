@@ -73,6 +73,7 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 		loading_mode_ = !loading_mode_;
 		if(loading_mode_){
 			minecraft_character->timer = tic();
+			eye_ = minecraft_character->getCharacterPosition();
 			setInitCharacterHeight();
 			setPoseDirty();
 			// eye_ = minecraft_character->getCharacterPosition();
