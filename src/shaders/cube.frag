@@ -48,7 +48,7 @@ float fade(float t) {
   return t*t*t*(t*(t*6.0-15.0)+10.0); // Improved fade
 }
  
-// I followed this idea to pass in gradient vectors to GPU as textures: 
+// I followed this idea to pass in gradient vectors to GPU as textures and generate perlin noise on GPU:
 // http://www.sci.utah.edu/~leenak/IndStudy_reportfall/MarbleCode.txt
 float perlinNoise(vec3 P)
 {
@@ -57,11 +57,11 @@ float perlinNoise(vec3 P)
   vec3 Pf = P-floor(P);
   
   // Noise contributions from (x=0, y=0), z=0 and z=1
-  float perm00 = texture(perm_texture, Pi.xy).a ;
-  vec3  grad000 = texture(perm_texture, vec2(perm00, Pi.z)).rgb * 4.0 - 1.0;
-  float n000 = dot(grad000, Pf);
+  float perm00 = texture(perm_texture, Pi.xy).a ; // range: 0.0 - 1.0
+  vec3  grad000 = texture(perm_texture, vec2(perm00, Pi.z)).rgb * 4.0 - 1.0;  // vector composed of {-1, 0, 1}
+  float n000 = dot(grad000, Pf);  // noise at (0, 0, 0) corner
   vec3  grad001 = texture(perm_texture, vec2(perm00, Pi.z + ONE)).rgb * 4.0 - 1.0;
-  float n001 = dot(grad001, Pf - vec3(0.0, 0.0, 1.0));
+  float n001 = dot(grad001, Pf - vec3(0.0, 0.0, 1.0));  // noise at (0, 0, 1) corner
 
   // Noise contributions from (x=0, y=1), z=0 and z=1
   float perm01 = texture(perm_texture, Pi.xy + vec2(0.0, ONE)).a ;
@@ -83,6 +83,10 @@ float perlinNoise(vec3 P)
   float n110 = dot(grad110, Pf - vec3(1.0, 1.0, 0.0));
   vec3  grad111 = texture(perm_texture, vec2(perm11, Pi.z + ONE)).rgb * 4.0 - 1.0;
   float n111 = dot(grad111, Pf - vec3(1.0, 1.0, 1.0));
+
+  
+
+
 
   // Blend contributions along x
   vec4 n_x = lerp4D(vec4(n000, n001, n010, n011), vec4(n100, n101, n110, n111), fade(Pf.x));

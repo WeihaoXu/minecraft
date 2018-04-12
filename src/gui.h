@@ -60,6 +60,7 @@ public:
 	bool isDpressed() const {return d_pressed_;}
 
 	void deleteCube();
+	void addCube();
 
 	bool isCharacterJumping() const {return minecraft_character->isJumping(); }
 	bool isInLoadingMode() const {return loading_mode_; }

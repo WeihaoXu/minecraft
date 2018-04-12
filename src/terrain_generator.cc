@@ -182,6 +182,35 @@ void TerrainGenerator::deleteCube(glm::vec3 camera_pos, glm::vec3 look_dir) {
 				<< "current del cubes: " << modify_map_[x_to_delete][z_to_delete] << "\n";
 }
 
+void TerrainGenerator::addCube(glm::vec3 camera_pos, glm::vec3 look_dir) {
+	int curr_grid_x = std::floor(camera_pos.x / cube_width_);
+	int curr_grid_z = std::floor(camera_pos.z / cube_width_);
+	float x_dir = look_dir.x, z_dir = look_dir.z;
+ 	
+	int x_to_delete = curr_grid_x;
+	int z_to_delete = curr_grid_z;
+
+	if(x_dir > 0 && fabs(x_dir) > fabs(z_dir)) {	// delete x+1 direction
+		x_to_delete = curr_grid_x + 1;
+		z_to_delete = curr_grid_z;
+	}
+	else if(x_dir < 0 && fabs(x_dir) > fabs(z_dir))	{// delete x - 1 direction
+		x_to_delete = curr_grid_x - 1;
+		z_to_delete = curr_grid_z;
+	}
+	else if(z_dir > 0 && fabs(z_dir) > fabs(x_dir)) {
+		x_to_delete = curr_grid_x;
+		z_to_delete = curr_grid_z + 1;
+	}
+	else if(z_dir < 0 && fabs(z_dir) > fabs(x_dir)) {
+		x_to_delete = curr_grid_x;
+		z_to_delete = curr_grid_z - 1;
+	}
+	modify_map_[x_to_delete][z_to_delete] ++;
+	std::cout << "add cube at world grid: (" << x_to_delete << ", " << z_to_delete << ") "
+				<< "current del cubes: " << modify_map_[x_to_delete][z_to_delete] << "\n";
+}
+
 
 // This method will update terrain if necessary based on camera's location.
 // Input: camera location.

@@ -19,6 +19,7 @@ public:
 	bool generateHeightMap();	// compute height map based on camera position
 	void generateCubes();	// generate the positions of cubes to render based on height map.
 	void deleteCube(glm::vec3 cube_positon, glm::vec3 look_dir);	// delete the top cube in the front direction
+	void addCube(glm::vec3 cube_positon, glm::vec3 look_dir);	// add a cube in the front direction
 
 
 	float getHeight(float pos_x, float pos_z);

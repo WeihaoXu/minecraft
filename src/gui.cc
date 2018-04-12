@@ -67,8 +67,6 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 			day_light_speed_ += 1.0f;
 			change_day_light_speed_ = true;
 		}
-	} else if (key == GLFW_KEY_T && action != GLFW_RELEASE) {
-		transparent_ = !transparent_;
 	} else if ((key == GLFW_KEY_F && (mods & GLFW_MOD_CONTROL)) && action == GLFW_RELEASE) {
 		loading_mode_ = !loading_mode_;
 		if(loading_mode_){
@@ -83,7 +81,12 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 			terrain_generator_->deleteCube(eye_, look_);
 			terrain_modified = true;
 		}
-	}
+	} else if (key == GLFW_KEY_T && action != GLFW_PRESS) {
+		if(loading_mode_) {
+			terrain_generator_->addCube(eye_, look_);
+			terrain_modified = true;
+		}
+	} 
 }
 
 void GUI::mousePosCallback(double mouse_x, double mouse_y)
