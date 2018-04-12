@@ -58,9 +58,15 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 			roll_speed = roll_speed_;
 		// FIXME: actually roll the bone here
 	} else if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_RELEASE) {
-
+		if(day_light_speed_ > 1.0f){
+			day_light_speed_ -= 1.0f;
+			change_day_light_speed_ = true;
+		}
 	} else if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_RELEASE) {
-	
+		if(day_light_speed_ < 60.0f){
+			day_light_speed_ += 1.0f;
+			change_day_light_speed_ = true;
+		}
 	} else if (key == GLFW_KEY_T && action != GLFW_RELEASE) {
 		transparent_ = !transparent_;
 	} else if ((key == GLFW_KEY_F && (mods & GLFW_MOD_CONTROL)) && action == GLFW_RELEASE) {

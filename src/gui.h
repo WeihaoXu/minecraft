@@ -67,6 +67,10 @@ public:
 	void doJump();
 	glm::vec3 getMinecraftCharacterPosition() const{ return minecraft_character->getCharacterPosition(); }
 	void updateMinecraftCharacterYcoordinate(float y_coord) {minecraft_character->setCharacterPosition(glm::vec3(eye_.x, y_coord, eye_.z));}
+
+	float getDayLightSpeed() const {return day_light_speed_;}
+	bool dayLightSpeedChanged() const {return change_day_light_speed_;}
+	void resetDayLightSpeed() { change_day_light_speed_ = false; }
 private:
 	GLFWwindow* window_;
 	TerrainGenerator* terrain_generator_;
@@ -94,6 +98,9 @@ private:
 	float rotation_speed_ = 0.02f;
 	float zoom_speed_ = 0.25f; //0.163f; //0.1f * 5;
 	float aspect_;
+
+	float day_light_speed_ = 5.0f;
+	bool change_day_light_speed_ = false;
 
 	// glm::vec3 eye_ = glm::vec3(0.0f, 0.1f, camera_distance_);
 	glm::vec3 eye_ = glm::vec3(0.0f, 10.0f, camera_distance_);

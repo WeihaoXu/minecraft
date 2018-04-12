@@ -252,6 +252,8 @@ int main(int argc, char* argv[])
 	bool draw_cube = true;
 	TicTocTimer timer = tic();
 
+	float totalTimeDifference = 0.0f;
+
 	while (!glfwWindowShouldClose(window)) {
 		// Setup some basic window stuff.
 		glfwGetFramebufferSize(window, &window_width, &window_height);
@@ -366,11 +368,15 @@ int main(int argc, char* argv[])
 		}
 
 		if(draw_floor) {
-			timeDiff += toc(&timer);
+			if(gui.dayLightSpeedChanged()){
+				gui.resetDayLightSpeed();
+				totalTimeDifference = timeDiff * gui.getDayLightSpeed();
+			}
+			totalTimeDifference += toc(&timer);
+			timeDiff = totalTimeDifference/gui.getDayLightSpeed();
 			if(timeDiff > 20.0f){
 				timeDiff = 0.0f;
 			}
-			// std::cout << timeDiff << "\n";
 
 			sky_pass.setup();
 			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
