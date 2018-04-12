@@ -255,7 +255,7 @@ bool GUI::captureWASDUPDOWN(int key, int action)
 
 void GUI::setJumpingCharacterHeight(glm::vec3 eye_move){
 	float next_y_coord = terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z);
-	if (next_y_coord < 0){
+	if (terrain_generator_->isWater(eye_.x + eye_move.x, eye_.z + eye_move.z)){
 		return;
 	} 
 	eye_ += eye_move;
@@ -376,9 +376,9 @@ bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
 
 	if(next_y_coord > current_y_coord){
 		return false;
-	} else if (next_y_coord < 0){
+	} else if (terrain_generator_->isWater(eye_.x + eye_move.x, eye_.z + eye_move.z)){
 		return false;
-	} 
+	}
 	else if (max > next_y_coord && max > current_y_coord){
 		return false;
 	}
