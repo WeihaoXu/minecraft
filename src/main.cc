@@ -54,12 +54,6 @@ const char* sky_fragment_shader =
 #include "shaders/sky.frag"
 ;
 
-// const char* horizon_fragment_shader =
-// #include "shaders/horizon.frag"
-// ;
-
-
-
 const char* cube_vertex_shader =
 #include "shaders/cube.vert"
 ;
@@ -199,9 +193,9 @@ int main(int argc, char* argv[])
 	auto sky_offset_data = [&terrain_generator]() -> const void* {
 		return (const void*) &terrain_generator.sky_offset[0];
 	};
-	float timePassed = 0.0;
-	auto time_passed_data = [&timePassed]() -> const void* {
-		return &timePassed;
+	float timeDiff = 0.0;
+	auto time_passed_data = [&timeDiff]() -> const void* {
+		return &timeDiff;
 	};
 
 
@@ -224,6 +218,7 @@ int main(int argc, char* argv[])
 	// sky render pass
 	RenderDataInput sky_pass_input;
 	sky_pass_input.assign(0, "vertex_position", terrain_generator.sky_cube_vertices.data(), terrain_generator.sky_cube_vertices.size(), 4, GL_FLOAT);
+	sky_pass_input.assign(1, "uv", terrain_generator.sky_cube_uvs.data(), terrain_generator.sky_cube_uvs.size(), 2, GL_FLOAT);
 	sky_pass_input.assignIndex(terrain_generator.sky_cube_faces.data(), terrain_generator.sky_cube_faces.size(), 3);
 	
 	RenderPass sky_pass(-1,
@@ -232,17 +227,6 @@ int main(int argc, char* argv[])
 			{cube_model, std_view, std_proj, perm_texture, sky_offset, time_pass},
 			{"fragment_color"}
 			);
-
-	// RenderDataInput horizon_pass_input;
-	// horizon_pass_input.assign(0, "vertex_position", terrain_generator.horizon_cube_vertices.data(), terrain_generator.horizon_cube_vertices.size(), 4, GL_FLOAT);
-	// horizon_pass_input.assignIndex(terrain_generator.horizon_cube_faces.data(), terrain_generator.horizon_cube_faces.size(), 3);
-	
-	// RenderPass horizon_pass(-1,
-	// 		horizon_pass_input,
-	// 		{sky_vertex_shader, sky_geometry_shader, horizon_fragment_shader},
-	// 		{cube_model, std_view, std_proj, perm_texture, sky_offset, time_pass},
-	// 		{"fragment_color"}
-	// 		);
 
 
 
@@ -267,7 +251,6 @@ int main(int argc, char* argv[])
 	bool draw_floor = true;
 	bool draw_cube = true;
 	TicTocTimer timer = tic();
-	float timeDiff = 0.0f;
 
 	while (!glfwWindowShouldClose(window)) {
 		// Setup some basic window stuff.
@@ -384,26 +367,11 @@ int main(int argc, char* argv[])
 
 		if(draw_floor) {
 			timeDiff += toc(&timer);
-			if(timeDiff > 21.0f){
-				timePassed = 0.0f;
+			if(timeDiff > 20.0f){
 				timeDiff = 0.0f;
 			}
-			if(timeDiff < 8.0f){
-				timePassed = 0.0f;
-			} else if (timeDiff < 10.0f){
-				timePassed = 1.0f;
-			} else if (timeDiff < 18.0f){
-				timePassed = 2.0f;
-			} else {
-				timePassed = 3.0f;
-			}
-
 			// std::cout << timeDiff << "\n";
-			// std::cout << timePassed << "\n";
-			// horizon_pass.setup();
-			// CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
-			//                               terrain_generator.horizon_cube_faces.size() * 3,
-			//                               GL_UNSIGNED_INT, 0));
+
 			sky_pass.setup();
 			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
 			                              terrain_generator.sky_cube_faces.size() * 3,

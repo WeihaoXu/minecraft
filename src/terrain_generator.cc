@@ -30,8 +30,7 @@ TerrainGenerator::~TerrainGenerator()
 // create a cube located at (0, 0, 0) with width = cube_width
 void TerrainGenerator::generateUnitCubes() {
 	generate_unit_cube(cube_width_, cube_vertices, cube_normals, cube_faces, cube_uvs);	// in procedure_geometry.h
-	generate_unit_cube_inside_out(cube_width_ * x_size_, sky_cube_vertices, sky_cube_faces);
-	generate_unit_cube_inside_out_horizon(cube_width_ * x_size_, horizon_cube_vertices, horizon_cube_faces);
+	generate_unit_cube_inside_out(cube_width_ * x_size_, sky_cube_vertices, sky_cube_faces, sky_cube_uvs);
 }
 
 bool TerrainGenerator::generateHeightMap()
@@ -157,7 +156,8 @@ void TerrainGenerator::deleteCube(glm::vec3 camera_pos, glm::vec3 look_dir) {
 	int curr_grid_z = std::floor(camera_pos.z / cube_width_);
 	float x_dir = look_dir.x, z_dir = look_dir.z;
  	
-	int x_to_delete, z_to_delete;
+	int x_to_delete = curr_grid_x;
+	int z_to_delete = curr_grid_z;
 
 	if(x_dir > 0 && fabs(x_dir) > fabs(z_dir)) {	// delete x+1 direction
 		x_to_delete = curr_grid_x + 1;

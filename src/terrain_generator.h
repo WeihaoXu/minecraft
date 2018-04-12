@@ -34,8 +34,7 @@ public:
 
 	std::vector<glm::vec4> sky_cube_vertices;
 	std::vector<glm::uvec3> sky_cube_faces;
-	std::vector<glm::vec4> horizon_cube_vertices;
-	std::vector<glm::uvec3> horizon_cube_faces;
+	std::vector<glm::vec2> sky_cube_uvs;
 
 private:
 	Perlin perlin_;

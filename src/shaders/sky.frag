@@ -1,7 +1,7 @@
 R"zzz(#version 410 core
 
-
-in float day_time;
+in vec2 uv_coords;
+uniform float day_time;
 in vec4 world_position;
 uniform sampler2D perm_texture;
 
@@ -11,10 +11,13 @@ out vec4 fragment_color;
 #define ONE 0.00390625
 #define ONEHALF 0.001953125
 #define eps 0.001
-#define TYPE_DAY 0.0
-#define TYPE_DUSK 1.0
-#define TYPE_NIGHT 2.0
-#define TYPE_DAWN 3.0
+
+#define DAY_TIME 10.0
+#define DUSK_ONE_TIME 0.75
+#define DUSK_TWO_TIME 0.75
+#define NIGHT_TIME 7.0
+#define DAWN_ONE_TIME 0.75
+#define DAWN_TWO_TIME 0.75
 
 vec4 light_direction = vec4(normalize(vec3(0.4, 1.0, 0.6)), 0.0);
  
@@ -99,87 +102,66 @@ float turbulence(vec3 P, float size)
 }
 
 
-
-vec4 generateDayColor(vec4 world_pos) {
+vec4 generateColor(vec4 world_pos, vec3 color_0) {
   vec3 ambient = vec3(0.1, 0.1, 0.1) * 0;
- 
   float freq_world = 7.721;
 
-  vec3 color_0 = vec3(255,255,220) / 255.0 * 1.0;  //vec3(135, 206, 250) / 255.0 * 1.0;   
-  vec3 color_1 = vec3(255, 255, 255) / 255.0 * 1.0; 
+  vec3 color_1 = color_0;
 
   float perlin_noise = turbulence(world_pos.xyz, 30.0);
-
   vec3 diffuse = lerp3D(color_0, color_1, perlin_noise);
   vec3 color = clamp(diffuse, 0.0, 1.0);
 
   return vec4(color, 1.0);
 }
 
-vec4 generateDuskColor(vec4 world_pos) {
-  vec3 ambient = vec3(0.1, 0.1, 0.1) * 0;
- 
-  float freq_world = 7.721;
-
-  vec3 color_0 = vec3(255, 60, 60) / 255.0 * 1.0; //vec3(23,2,102) / 255.0 * 1.0;
-  vec3 color_1 = vec3(96,96,96) / 255.0 * 1.0;
-
-  float perlin_noise = turbulence(world_pos.xyz, 30.0);
-
-  vec3 diffuse = lerp3D(color_0, color_1, perlin_noise);
-  vec3 color = clamp(diffuse, 0.0, 1.0);
-
-  return vec4(color, 1.0);
-}
-
-vec4 generateNightColor(vec4 world_pos) {
-  vec3 ambient = vec3(0.1, 0.1, 0.1) * 0;
- 
-  float freq_world = 7.721;
-
-  vec3 color_0 = vec3(0,0,0) / 255.0 * 1.0; //vec3(24,15,42) / 255.0 * 1.0;
-  vec3 color_1 = vec3(24,24,24) / 255.0 * 1.0;
-
-  float perlin_noise = turbulence(world_pos.xyz, 30.0);
-
-  vec3 diffuse = lerp3D(color_0, color_1, perlin_noise);
-  vec3 color = clamp(diffuse, 0.0, 1.0);
-
-  return vec4(color, 1.0);
-}
-
-vec4 generateDawnColor(vec4 world_pos) {
-  vec3 ambient = vec3(0.1, 0.1, 0.1) * 0;
- 
-  float freq_world = 7.721;
-
-  vec3 color_0 = vec3(23,2,102) / 255.0 * 1.0;
-  vec3 color_1 = vec3(96,96,96) / 255.0 * 1.0;
-
-  float perlin_noise = turbulence(world_pos.xyz, 30.0);
-
-  vec3 diffuse = lerp3D(color_0, color_1, perlin_noise);
-  vec3 color = clamp(diffuse, 0.0, 1.0);
-
-  return vec4(color, 1.0);
-}
 
 void main()
 {
-   if(day_time < TYPE_DAY + eps) {
-    fragment_color = generateDayColor(world_position);
-   }
-   else if(day_time < TYPE_DUSK + eps) {
-    fragment_color = generateDuskColor(world_position);
-   }
-   else if (day_time < TYPE_NIGHT + eps){
-    fragment_color = generateNightColor(world_position);
-   }
-   else if (day_time < TYPE_DAWN + eps){
-    fragment_color = generateDawnColor(world_position);
-   } else {
-    fragment_color = generateDayColor(world_position);
-   }
+  vec3 color_0 = vec3(0,0,0);
+
+  if(day_time < (DAY_TIME + eps)) {
+    color_0 = vec3(135, 206, 250) / 255.0 * 1.0;
+  } 
+  else if (day_time < (DAY_TIME + DUSK_ONE_TIME + eps)){
+    vec3 color_0_b = vec3(135, 206, 250) / 255.0 * 1.0;
+    vec3 color_0_a = vec3(23,2,102) / 255.0 * 1.0;
+    float mu = (DAY_TIME + DUSK_ONE_TIME - day_time)/DUSK_ONE_TIME;
+    color_0 = color_0_b * mu + color_0_a * (1-mu);
+  }
+  else if(day_time < (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + eps)) {
+    vec3 color_0_b = vec3(23,2,102) / 255.0 * 1.0;
+    vec3 color_0_a = vec3(24,15,42) / 255.0 * 1.0;
+    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME - day_time)/DUSK_TWO_TIME;
+    color_0 = color_0_b * mu + color_0_a * (1-mu);
+  }
+  else if(day_time < (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + eps)){
+    color_0 = vec3(24,15,42) / 255.0 * 1.0;
+  }
+  else if (day_time < (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + eps)){
+    vec3 color_0_b = vec3(24,15,42) / 255.0 * 1.0;
+    vec3 color_0_a = vec3(23,2,102) / 255.0 * 1.0;
+    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME - day_time)/DAWN_ONE_TIME;
+    color_0 = color_0_b * mu + color_0_a * (1-mu);
+  }
+  else if(day_time < (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + DAWN_TWO_TIME + eps)) {
+    vec3 color_0_b = vec3(23,2,102) / 255.0 * 1.0;
+    vec3 color_0_a = vec3(135, 206, 250)  / 255.0 * 1.0;
+    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + DAWN_TWO_TIME - day_time)/DAWN_TWO_TIME;
+    color_0 = color_0_b * mu + color_0_a * (1-mu);
+  } else {
+    vec3 color_0_b = vec3(23,2,102) / 255.0 * 1.0;
+    vec3 color_0_a = vec3(135, 206, 250)  / 255.0 * 1.0;
+    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + DAWN_TWO_TIME - day_time)/DAWN_TWO_TIME;
+    color_0 = color_0_b * mu + color_0_a * (1-mu);
+  }
+
+  vec3 color1 = vec3(253,94,83) / 255.0 * 1.0;
+  vec3 tmp_color = mix(color_0, color1, uv_coords[0] + uv_coords[1] - 2 * uv_coords[0] * uv_coords[1]);
+  //fragment_color = generateColor(world_position, tmp_color);
+   
+  fragment_color = vec4(tmp_color, 1.0);
+
 }
 
 )zzz"
