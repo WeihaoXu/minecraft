@@ -17,7 +17,7 @@ out vec4 fragment_color;
 #define TYPE_DAWN 3.0
 
 vec4 light_direction = vec4(normalize(vec3(0.4, 1.0, 0.6)), 0.0);
- 
+
 float lerp(float a, float b, float t) { 
   return a + t * (b - a); 
 }
@@ -105,8 +105,8 @@ vec4 generateDayColor(vec4 world_pos) {
  
   float freq_world = 7.721;
 
-  vec3 color_0 = vec3(255,255,220) / 255.0 * 1.0;  //vec3(135, 206, 250) / 255.0 * 1.0;   
-  vec3 color_1 = vec3(255, 255, 255) / 255.0 * 1.0; 
+  vec3 color_0 = vec3(23,2,102) / 255.0 * 1.0;
+  vec3 color_1 = vec3(96,96,96) / 255.0 * 1.0;
 
   float perlin_noise = turbulence(world_pos.xyz, 30.0);
 
@@ -121,8 +121,8 @@ vec4 generateDuskColor(vec4 world_pos) {
  
   float freq_world = 7.721;
 
-  vec3 color_0 = vec3(255, 60, 60) / 255.0 * 1.0; //vec3(23,2,102) / 255.0 * 1.0;
-  vec3 color_1 = vec3(96,96,96) / 255.0 * 1.0;
+  vec3 color_0 = vec3(135, 206, 250) / 255.0 * 1.0;
+  vec3 color_1 = vec3(255, 255, 255) / 255.0 * 1.0;
 
   float perlin_noise = turbulence(world_pos.xyz, 30.0);
 
@@ -137,8 +137,8 @@ vec4 generateNightColor(vec4 world_pos) {
  
   float freq_world = 7.721;
 
-  vec3 color_0 = vec3(0,0,0) / 255.0 * 1.0; //vec3(24,15,42) / 255.0 * 1.0;
-  vec3 color_1 = vec3(24,24,24) / 255.0 * 1.0;
+  vec3 color_0 = vec3(23,2,102) / 255.0 * 1.0;
+  vec3 color_1 = vec3(96,96,96) / 255.0 * 1.0;
 
   float perlin_noise = turbulence(world_pos.xyz, 30.0);
 
@@ -153,8 +153,8 @@ vec4 generateDawnColor(vec4 world_pos) {
  
   float freq_world = 7.721;
 
-  vec3 color_0 = vec3(23,2,102) / 255.0 * 1.0;
-  vec3 color_1 = vec3(96,96,96) / 255.0 * 1.0;
+  vec3 color_0 = vec3(24,15,42) / 255.0 * 1.0;
+  vec3 color_1 = vec3(24,24,24) / 255.0 * 1.0;
 
   float perlin_noise = turbulence(world_pos.xyz, 30.0);
 

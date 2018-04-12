@@ -397,6 +397,7 @@ int main(int argc, char* argv[])
 			} else {
 				timePassed = 3.0f;
 			}
+
 			// std::cout << timeDiff << "\n";
 			// std::cout << timePassed << "\n";
 			// horizon_pass.setup();

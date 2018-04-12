@@ -31,6 +31,7 @@ TerrainGenerator::~TerrainGenerator()
 void TerrainGenerator::generateUnitCubes() {
 	generate_unit_cube(cube_width_, cube_vertices, cube_normals, cube_faces, cube_uvs);	// in procedure_geometry.h
 	generate_unit_cube_inside_out(cube_width_ * x_size_, sky_cube_vertices, sky_cube_faces);
+	generate_unit_cube_inside_out_horizon(cube_width_ * x_size_, horizon_cube_vertices, horizon_cube_faces);
 }
 
 bool TerrainGenerator::generateHeightMap()
