@@ -1,3 +1,5 @@
+// I followed this idea to pass in gradient vectors to GPU as textures: 
+// http://www.sci.utah.edu/~leenak/IndStudy_reportfall/MarbleCode.txt
 int perm[256]= {151,160,137,91,90,15,
   131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
   190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
@@ -34,7 +36,7 @@ void initPermTexture(GLuint *texID)
     for(j = 0; j<256; j++) {
       int offset = (i*256+j)*4;
       char value = perm[(j+perm[i]) & 0xFF];
-      pixels[offset] = grad3[value & 0x0F][0] * 64 + 64;   // Gradient x
+      pixels[offset] = grad3[value & 0x0F][0] * 64 + 64;   // Gradient x, scale to range  0 - 127 (1 byte)
       pixels[offset+1] = grad3[value & 0x0F][1] * 64 + 64; // Gradient y
       pixels[offset+2] = grad3[value & 0x0F][2] * 64 + 64; // Gradient z
       pixels[offset+3] = value;                     // Permuted index
