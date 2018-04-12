@@ -104,11 +104,9 @@ float turbulence(vec3 P, float size)
 }
 
 
-vec4 generateColor(vec4 world_pos, vec3 color_0) {
+vec4 generateColor(vec4 world_pos, vec3 color_0, vec3 color_1) {
   vec3 ambient = vec3(0.1, 0.1, 0.1) * 0;
   float freq_world = 7.721;
-
-  vec3 color_1 = color_0;
 
   float perlin_noise = turbulence(world_pos.xyz, 30.0);
   vec3 diffuse = lerp3D(color_0, color_1, perlin_noise);
@@ -121,48 +119,100 @@ vec4 generateColor(vec4 world_pos, vec3 color_0) {
 void main()
 {
   vec3 color_0 = vec3(0,0,0);
+  vec3 color_1 = vec3(0,0,0);
+  vec3 cloud_color = vec3(0,0,0);
 
   if(day_time < (DAY_TIME + eps)) {
     color_0 = vec3(135, 206, 250) / 255.0 * 1.0;
+    color_1 = vec3(1,1,1);
+    cloud_color = vec3(237, 237, 237) / 255.0 * 1.0;
   } 
   else if (day_time < (DAY_TIME + DUSK_ONE_TIME + eps)){
+    float mu = (DAY_TIME + DUSK_ONE_TIME - day_time)/DUSK_ONE_TIME;
+
     vec3 color_0_b = vec3(135, 206, 250) / 255.0 * 1.0;
     vec3 color_0_a = vec3(23,2,102) / 255.0 * 1.0;
-    float mu = (DAY_TIME + DUSK_ONE_TIME - day_time)/DUSK_ONE_TIME;
     color_0 = color_0_b * mu + color_0_a * (1-mu);
+
+    vec3 color_1_b = vec3(1,1,1);
+    vec3 color_1_a = vec3(253,94,83) / 255.0 * 1.0;
+    color_1 = color_1_b * mu + color_1_a * (1-mu);
+
+    vec3 color_2_b = vec3(237, 237, 237) / 255.0 * 1.0;
+    vec3 color_2_a = vec3(96,96,96) / 255.0 * 1.0;
+    cloud_color = color_2_b * mu + color_2_a * (1-mu);
   }
   else if(day_time < (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + eps)) {
+    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME - day_time)/DUSK_TWO_TIME;
+
     vec3 color_0_b = vec3(23,2,102) / 255.0 * 1.0;
     vec3 color_0_a = vec3(24,15,42) / 255.0 * 1.0;
-    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME - day_time)/DUSK_TWO_TIME;
     color_0 = color_0_b * mu + color_0_a * (1-mu);
+
+    vec3 color_1_b = vec3(253,94,83) / 255.0 * 1.0;
+    vec3 color_1_a = vec3(0,0,0);
+    color_1 = color_1_b * mu + color_1_a * (1-mu);
+
+    vec3 color_2_b = vec3(96,96,96) / 255.0 * 1.0;
+    vec3 color_2_a = vec3(0, 0, 0);
+    cloud_color = color_2_b * mu + color_2_a * (1-mu);
+
   }
   else if(day_time < (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + eps)){
     color_0 = vec3(24,15,42) / 255.0 * 1.0;
+    color_1 = vec3(0,0,0);
+    cloud_color = vec3(0, 0, 0);
   }
   else if (day_time < (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + eps)){
+    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME - day_time)/DAWN_ONE_TIME;
+
     vec3 color_0_b = vec3(24,15,42) / 255.0 * 1.0;
     vec3 color_0_a = vec3(23,2,102) / 255.0 * 1.0;
-    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME - day_time)/DAWN_ONE_TIME;
     color_0 = color_0_b * mu + color_0_a * (1-mu);
+
+    vec3 color_1_b = vec3(0,0,0);
+    vec3 color_1_a = vec3(253,94,83) / 255.0 * 1.0;
+    color_1 = color_1_b * mu + color_1_a * (1-mu);
+
+    vec3 color_2_b = vec3(0, 0, 0);
+    vec3 color_2_a = vec3(96,96,96) / 255.0 * 1.0;
+    cloud_color = color_2_b * mu + color_2_a * (1-mu);
   }
   else if(day_time < (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + DAWN_TWO_TIME + eps)) {
+    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + DAWN_TWO_TIME - day_time)/DAWN_TWO_TIME;
+
     vec3 color_0_b = vec3(23,2,102) / 255.0 * 1.0;
     vec3 color_0_a = vec3(135, 206, 250)  / 255.0 * 1.0;
-    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + DAWN_TWO_TIME - day_time)/DAWN_TWO_TIME;
     color_0 = color_0_b * mu + color_0_a * (1-mu);
+
+    vec3 color_1_b = vec3(253,94,83) / 255.0 * 1.0;
+    vec3 color_1_a = vec3(1,1,1);
+    color_1 = color_1_b * mu + color_1_a * (1-mu);
+
+    vec3 color_2_b = vec3(96,96,96) / 255.0 * 1.0;
+    vec3 color_2_a = vec3(237, 237, 237) / 255.0 * 1.0;
+    cloud_color = color_2_b * mu + color_2_a * (1-mu);
+
   } else {
+    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + DAWN_TWO_TIME - day_time)/DAWN_TWO_TIME;
+
     vec3 color_0_b = vec3(23,2,102) / 255.0 * 1.0;
     vec3 color_0_a = vec3(135, 206, 250)  / 255.0 * 1.0;
-    float mu = (DAY_TIME + DUSK_ONE_TIME + DUSK_TWO_TIME + NIGHT_TIME + DAWN_ONE_TIME + DAWN_TWO_TIME - day_time)/DAWN_TWO_TIME;
     color_0 = color_0_b * mu + color_0_a * (1-mu);
+
+    vec3 color_1_b = vec3(253,94,83) / 255.0 * 1.0;
+    vec3 color_1_a = vec3(1,1,1);
+    color_1 = color_1_b * mu + color_1_a * (1-mu);
+
+    vec3 color_2_b = vec3(96,96,96) / 255.0 * 1.0;
+    vec3 color_2_a = vec3(237, 237, 237) / 255.0 * 1.0;
+    cloud_color = color_2_b * mu + color_2_a * (1-mu);
   }
 
-  vec3 color1 = vec3(253,94,83) / 255.0 * 1.0;
-  vec3 tmp_color = mix(color_0, color1, uv_coords[0] + uv_coords[1] - 2 * uv_coords[0] * uv_coords[1]);
-  //fragment_color = generateColor(world_position, tmp_color);
+  vec3 horizon_color = mix(color_0, color_1, uv_coords[0] + uv_coords[1] - 2 * uv_coords[0] * uv_coords[1]);
+  fragment_color = generateColor(world_position, horizon_color, cloud_color);
    
-  fragment_color = vec4(tmp_color, 1.0);
+  //fragment_color = vec4(tmp_color, 1.0);
 
 }
 
