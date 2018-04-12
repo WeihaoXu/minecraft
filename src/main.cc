@@ -408,25 +408,25 @@ int main(int argc, char* argv[])
 			if(timeDiff > 11.5f && timeDiff < 18.5f){
 				terrain_generator.updateMoonOffset();
 				if(timeDiff < 15.0f){
-					terrain_generator.moon_offset.y = (timeDiff - 11.5f) * (timeDiff - 11.5f) * 25.0f/3.5f;
-					if(terrain_generator.moon_offset.y > 40.f){
-						terrain_generator.moon_offset.y = 40.f;
+					terrain_generator.moon_offset.y = 3.0f + (timeDiff - 11.5f) * (timeDiff - 11.5f) * 25.0f/3.5f;
+					if(terrain_generator.moon_offset.y > 43.f){
+						terrain_generator.moon_offset.y = 43.f;
 					}
 
 					// std::cout << "increase" << terrain_generator.moon_offset.y << "\n";
 				} else {
 					if(timeDiff > 16.1f){
-						terrain_generator.moon_offset.y = (timeDiff - 16.1f) * (timeDiff - 16.1f) * 25.0f/3.5f;
-						if(terrain_generator.moon_offset.y > 40.f){
-							terrain_generator.moon_offset.y = 40.f;
+						terrain_generator.moon_offset.y = 3.0f + (timeDiff - 16.1f) * (timeDiff - 16.1f) * 25.0f/3.5f;
+						if(terrain_generator.moon_offset.y > 43.f){
+							terrain_generator.moon_offset.y = 43.f;
 							// std::cout << "decrease" << timeDiff << "\n";
 						}
-						terrain_generator.moon_offset.y = 40.f - terrain_generator.moon_offset.y;
+						terrain_generator.moon_offset.y = 43.f - terrain_generator.moon_offset.y;
 
 						// std::cout << "decrease" << terrain_generator.moon_offset.y << "\n";
 					}
 					else {
-						terrain_generator.moon_offset.y = 40.f;
+						terrain_generator.moon_offset.y = 43.f;
 					}
 				}
 				
