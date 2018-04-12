@@ -193,9 +193,20 @@ int main(int argc, char* argv[])
 	auto sky_offset_data = [&terrain_generator]() -> const void* {
 		return (const void*) &terrain_generator.sky_offset[0];
 	};
+	auto moon_offset_data = [&terrain_generator]() -> const void* {
+		return (const void*) &terrain_generator.moon_offset[0];
+	};
 	float timeDiff = 0.0;
 	auto time_passed_data = [&timeDiff]() -> const void* {
 		return &timeDiff;
+	};
+	int is_moon_bool = 1;
+	auto is_moon_data = [&is_moon_bool]() -> const void* {
+		return &is_moon_bool;
+	};
+	int is_not_moon_bool = 0;
+	auto is_not_moon_data = [&is_not_moon_bool]() -> const void* {
+		return &is_not_moon_bool;
 	};
 
 
@@ -213,7 +224,10 @@ int main(int argc, char* argv[])
 	ShaderUniform std_light = { "light_position", vector_binder, std_light_data };
 	ShaderUniform perm_texture = {"perm_texture", texture0_binder, texture_data};
 	ShaderUniform sky_offset = {"sky_offset", vector3_binder, sky_offset_data};
+	ShaderUniform moon_offset = {"sky_offset", vector3_binder, moon_offset_data};
 	ShaderUniform time_pass = { "day_time", float_binder, time_passed_data};
+	ShaderUniform is_moon = { "is_moon", int_binder, is_moon_data};
+	ShaderUniform is_not_moon = { "is_moon", int_binder, is_not_moon_data};
 
 	// sky render pass
 	RenderDataInput sky_pass_input;
@@ -224,7 +238,19 @@ int main(int argc, char* argv[])
 	RenderPass sky_pass(-1,
 			sky_pass_input,
 			{sky_vertex_shader, sky_geometry_shader, sky_fragment_shader},
-			{cube_model, std_view, std_proj, perm_texture, sky_offset, time_pass},
+			{cube_model, std_view, std_proj, perm_texture, sky_offset, time_pass, is_not_moon},
+			{"fragment_color"}
+			);
+
+	RenderDataInput moon_pass_input;
+	moon_pass_input.assign(0, "vertex_position", terrain_generator.moon_cube_vertices.data(), terrain_generator.moon_cube_vertices.size(), 4, GL_FLOAT);
+	moon_pass_input.assign(1, "uv", terrain_generator.moon_cube_uvs.data(), terrain_generator.moon_cube_uvs.size(), 2, GL_FLOAT);
+	moon_pass_input.assignIndex(terrain_generator.moon_cube_faces.data(), terrain_generator.moon_cube_faces.size(), 3);
+	
+	RenderPass moon_pass(-1,
+			moon_pass_input,
+			{sky_vertex_shader, sky_geometry_shader, sky_fragment_shader},
+			{cube_model, std_view, std_proj, perm_texture, moon_offset, time_pass, is_moon},
 			{"fragment_color"}
 			);
 
@@ -253,7 +279,6 @@ int main(int argc, char* argv[])
 	TicTocTimer timer = tic();
 
 	float totalTimeDifference = 0.0f;
-
 	while (!glfwWindowShouldClose(window)) {
 		// Setup some basic window stuff.
 		glfwGetFramebufferSize(window, &window_width, &window_height);
@@ -376,6 +401,39 @@ int main(int argc, char* argv[])
 			timeDiff = totalTimeDifference/gui.getDayLightSpeed();
 			if(timeDiff > 20.0f){
 				timeDiff = 0.0f;
+				totalTimeDifference = 0.0f;
+			}
+			if(timeDiff > 11.5f && timeDiff < 18.5f){
+				terrain_generator.updateMoonOffset();
+				if(timeDiff < 15.0f){
+					terrain_generator.moon_offset.y = (timeDiff - 11.5f) * (timeDiff - 11.5f) * 25.0f/3.5f;
+					if(terrain_generator.moon_offset.y > 40.f){
+						terrain_generator.moon_offset.y = 40.f;
+					}
+
+					// std::cout << "increase" << terrain_generator.moon_offset.y << "\n";
+				} else {
+					if(timeDiff > 16.1f){
+						terrain_generator.moon_offset.y = (timeDiff - 16.1f) * (timeDiff - 16.1f) * 25.0f/3.5f;
+						if(terrain_generator.moon_offset.y > 40.f){
+							terrain_generator.moon_offset.y = 40.f;
+							// std::cout << "decrease" << timeDiff << "\n";
+						}
+						terrain_generator.moon_offset.y = 40.f - terrain_generator.moon_offset.y;
+
+						// std::cout << "decrease" << terrain_generator.moon_offset.y << "\n";
+					}
+					else {
+						terrain_generator.moon_offset.y = 40.f;
+					}
+				}
+				
+				terrain_generator.moon_offset.x += (timeDiff - 11.5f) * terrain_generator.getXSize()/7.0f;
+				
+				moon_pass.setup();
+				CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
+			                              terrain_generator.moon_cube_faces.size() * 3,
+			                              GL_UNSIGNED_INT, 0));
 			}
 
 			sky_pass.setup();

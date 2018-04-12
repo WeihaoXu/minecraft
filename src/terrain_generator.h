@@ -22,7 +22,12 @@ public:
 
 
 	float getHeight(float pos_x, float pos_z);
-	glm::vec3 sky_offset = glm::vec3(0.0, 0.0, 0.0);	
+	float getXSize() const {return x_size_;}
+	float getZSize() const {return z_size_;};
+	glm::vec3 sky_offset = glm::vec3(0.0, 0.0, 0.0);
+	glm::vec3 moon_offset = glm::vec3(0.0, 0.0, 0.0);
+	void updateMoonOffset();
+
 	// glm::vec3* getSkyOffsetPointer() {return &sky_offset_;};
 
 	std::vector<glm::vec4> cube_vertices;
@@ -31,6 +36,12 @@ public:
 	// std::vector<glm::vec4> cube_positions;	// <x, y, z, cube_Id>
 	std::vector<glm::vec4> cube_normals;
 	std::vector<glm::vec2> cube_uvs;
+
+	std::vector<glm::vec4> moon_cube_vertices;
+	std::vector<glm::uvec3> moon_cube_faces;
+	std::vector<glm::vec4> moon_cube_normals;
+	std::vector<glm::vec2> moon_cube_uvs;
+
 
 	std::vector<glm::vec4> sky_cube_vertices;
 	std::vector<glm::uvec3> sky_cube_faces;

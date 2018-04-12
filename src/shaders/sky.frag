@@ -4,6 +4,7 @@ in vec2 uv_coords;
 uniform float day_time;
 in vec4 world_position;
 uniform sampler2D perm_texture;
+uniform int is_moon;
 
 out vec4 fragment_color;
 
@@ -121,8 +122,11 @@ void main()
   vec3 color_0 = vec3(0,0,0);
   vec3 color_1 = vec3(0,0,0);
   vec3 cloud_color = vec3(0,0,0);
-
-  if(day_time < (DAY_TIME + eps)) {
+  if(is_moon == 1){
+    color_0 = vec3(1,1,1);
+    color_1 = vec3(1,1,1);
+    cloud_color = vec3(0,0,0);
+  } else if(day_time < (DAY_TIME + eps)) {
     color_0 = vec3(135, 206, 250) / 255.0 * 1.0;
     color_1 = vec3(1,1,1);
     cloud_color = vec3(237, 237, 237) / 255.0 * 1.0;

@@ -4,6 +4,7 @@
 #include "procedure_geometry.h"
 
 
+#include "glm/ext.hpp"
 
 TerrainGenerator::TerrainGenerator(float cube_width, int terrain_x_size, int terrain_z_size, glm::vec3 camera_position)
 	:cube_width_(cube_width), x_size_(terrain_x_size), z_size_(terrain_z_size), camera_position_(camera_position)
@@ -31,6 +32,7 @@ TerrainGenerator::~TerrainGenerator()
 void TerrainGenerator::generateUnitCubes() {
 	generate_unit_cube(cube_width_, cube_vertices, cube_normals, cube_faces, cube_uvs);	// in procedure_geometry.h
 	generate_unit_cube_inside_out(cube_width_ * x_size_, sky_cube_vertices, sky_cube_faces, sky_cube_uvs);
+	generate_unit_cube(cube_width_ * 2, moon_cube_vertices, moon_cube_normals, moon_cube_faces, moon_cube_uvs);
 }
 
 bool TerrainGenerator::generateHeightMap()
@@ -186,11 +188,19 @@ void TerrainGenerator::deleteCube(glm::vec3 camera_pos, glm::vec3 look_dir) {
 bool TerrainGenerator::updateTerrain(glm::vec3 camera_position) {
 	camera_position_ = camera_position;
 	sky_offset = gridToWorld(0, - x_size_ / 2, 0);
+	//std::cout << glm::to_string(sky_offset) << "\n";
+
 	bool hasUpdate = generateHeightMap();
 	if(!hasUpdate) return false;
 	
 	generateCubes();
 	return true;
+}
+
+void TerrainGenerator::updateMoonOffset(){
+	moon_offset = gridToWorld(0, x_size_ / 2, 0);
+	moon_offset.y = 0.0f;
+	moon_offset.z += z_size_ / 2;
 }
 
 // Get the terrain height at (pos_x, pos_z) position.
