@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
 		gui.updateMatrices();
 		mats = gui.getMatrixPointers();
 
-
+	
 		if(gui.isPoseDirty()) {
 			terrain_generator.updateTerrain(gui.getCamera());
 			// std::cout << "camera position: " << gui.getCamera().x << ", " << gui.getCamera().z << std::endl;
@@ -312,11 +312,14 @@ int main(int argc, char* argv[])
 			// }
 			gui.clearPose();
 		}
-
+	
 		if(gui.isTerrainModified()) {
+			terrain_generator.generateHeightMap();
 			terrain_generator.generateCubes();
 			gui.clearTerrainModify();
 		}
+
+	
 
 		if(gui.isCharacterJumping()){
 			if(gui.isWpressed()){
@@ -380,6 +383,7 @@ int main(int argc, char* argv[])
 			}
 		}
 
+
 		if(draw_cube) {
 			glVertexAttribDivisor(3, 1);
 			cube_pass.setup();
@@ -391,6 +395,7 @@ int main(int argc, char* argv[])
 					                              GL_UNSIGNED_INT, 0,
 					                              terrain_generator.cube_positions.size()));
 		}
+
 
 		if(draw_floor) {
 			if(gui.dayLightSpeedChanged()){
@@ -441,6 +446,7 @@ int main(int argc, char* argv[])
 			                              terrain_generator.sky_cube_faces.size() * 3,
 			                              GL_UNSIGNED_INT, 0));
 		}
+
 			
 			// std::cout << "offset size: " << cube_positions.size() << std::endl;
 		

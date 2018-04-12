@@ -47,14 +47,6 @@ bool TerrainGenerator::generateHeightMap()
 	int curr_grid_shift_x = grid_center_x - origin_grid_center_x;
 	int curr_grid_shift_z = grid_center_z - origin_grid_center_z;
 	
-	// std::cout << "current camera: " << grid_center_x << ", " << grid_center_z
-	// 			<< "  modify map value: " << modify_map_contains(grid_center_x, grid_center_z)
-	// 			<< std::endl;
-
-	if(curr_grid_shift_x == grid_shift_x_ && curr_grid_shift_z == grid_shift_z_ && !cube_positions.empty()) {	// no need to update
-		return false;
-	}
-	
 	// regenerate terrain
 	grid_shift_x_ = curr_grid_shift_x;
 	grid_shift_z_ = curr_grid_shift_z;
@@ -74,15 +66,26 @@ bool TerrainGenerator::generateHeightMap()
 }
 
 void TerrainGenerator::generateCubes() {
+	// std::cout << "start generating cubes" << std::endl;
 
 	for(auto const& subMap : modify_map_) {
+		// std::cout << "00000000" << std::endl;
 		int modify_grid_x = subMap.first;
+		// std::cout << "11111111" << std::endl;
 		for(auto const& z_v : subMap.second) {
 			int modify_grid_z = z_v.first;
 			int modify_value = z_v.second;
-			height_map_[modify_grid_x - grid_shift_x_][modify_grid_z - grid_shift_z_] += modify_value;
+			// std::cout << "222222222" << std::endl;
+			int shifted_grid_x = modify_grid_x - grid_shift_x_;
+			int shifted_grid_z = modify_grid_z - grid_shift_z_;
+			if(shifted_grid_x < 0 || shifted_grid_z < 0 || shifted_grid_x >= x_size_ || grid_shift_z_ > z_size_) continue;
+
+			height_map_[shifted_grid_x][shifted_grid_z] += modify_value;
+			// std::cout << "33333333" << std::endl;
 		}
 	}
+
+	// std::cout << "after add modify map" << std::endl;
 
 	
 	// cube_positions.clear();
@@ -96,6 +99,7 @@ void TerrainGenerator::generateCubes() {
 			// }
 
 			CubeType cube_type;
+			// std::cout << "444444444444444" << std::endl;
 			if(modify_map_contains(grid_x + grid_shift_x_, grid_z + grid_shift_z_)) {
 				cube_type = CubeType::DIRT;	// top cube deleted. so the remain can only be dirt
 			}
@@ -112,8 +116,12 @@ void TerrainGenerator::generateCubes() {
 				cube_type = CubeType::DIRT_GRASS;
 			}
 
+			// std::cout << "55555555555555" << std::endl;
+
 			glm::vec3 world_pos = gridToWorld(grid_x, top_grid_y, grid_z);
 			cube_positions.push_back(glm::vec4(world_pos, (int) cube_type));
+
+			// std::cout << "666666666666666" << std::endl;
 
 			// fill gaps between neighboring cubes
 			int cube_to_fill_num = 0;
@@ -133,18 +141,25 @@ void TerrainGenerator::generateCubes() {
 					glm::vec3 world_pos = gridToWorld(grid_x, top_grid_y - y_offset, grid_z);
 					cube_positions.push_back(glm::vec4(world_pos, (int) CubeType::DIRT));
 			}
-			
+			// std::cout << "777777777777777" << std::endl;
 		}
 	}
+
+	// std::cout << "after push cubes" << std::endl;
 
 	for(auto const& subMap : modify_map_) {
 		int modify_grid_x = subMap.first;
 		for(auto const& z_v : subMap.second) {
 			int modify_grid_z = z_v.first;
 			int modify_value = z_v.second;
-			height_map_[modify_grid_x - grid_shift_x_][modify_grid_z - grid_shift_z_] -= modify_value;
+			int shifted_grid_x = modify_grid_x - grid_shift_x_;
+			int shifted_grid_z = modify_grid_z - grid_shift_z_;
+			if(shifted_grid_x < 0 || shifted_grid_z < 0 || shifted_grid_x >= x_size_ || grid_shift_z_ > z_size_) continue;
+			height_map_[shifted_grid_x][shifted_grid_z] += modify_value;
 		}
 	}
+
+	// std::cout << "after clear modify map" << std::endl;
 
 	// std::cout << "updated center (x, z): " << cube_positions[x_size_ / 2].x << ", " << cube_positions[z_size_ / 2].z << std::endl;
 }
@@ -177,6 +192,9 @@ void TerrainGenerator::deleteCube(glm::vec3 camera_pos, glm::vec3 look_dir) {
 		x_to_delete = curr_grid_x;
 		z_to_delete = curr_grid_z - 1;
 	}
+	if(!modify_map_contains(x_to_delete, z_to_delete)) {
+		modify_map_[x_to_delete][z_to_delete] = 0;
+	}
 	modify_map_[x_to_delete][z_to_delete] --;
 	std::cout << "delete cube at world grid: (" << x_to_delete << ", " << z_to_delete << ") "
 				<< "current del cubes: " << modify_map_[x_to_delete][z_to_delete] << "\n";
@@ -206,6 +224,9 @@ void TerrainGenerator::addCube(glm::vec3 camera_pos, glm::vec3 look_dir) {
 		x_to_delete = curr_grid_x;
 		z_to_delete = curr_grid_z - 1;
 	}
+	if(!modify_map_contains(x_to_delete, z_to_delete)) {
+		modify_map_[x_to_delete][z_to_delete] = 0;
+	}
 	modify_map_[x_to_delete][z_to_delete] ++;
 	std::cout << "add cube at world grid: (" << x_to_delete << ", " << z_to_delete << ") "
 				<< "current del cubes: " << modify_map_[x_to_delete][z_to_delete] << "\n";
@@ -219,9 +240,19 @@ bool TerrainGenerator::updateTerrain(glm::vec3 camera_position) {
 	sky_offset = gridToWorld(0, - x_size_ / 2, 0);
 	//std::cout << glm::to_string(sky_offset) << "\n";
 
-	bool hasUpdate = generateHeightMap();
-	if(!hasUpdate) return false;
+	float center_x = camera_position_.x, center_z = camera_position_.z;
+	int grid_center_x = std::floor(center_x / cube_width_), grid_center_z = std::floor(center_z / cube_width_);
+	// std::cout << "grid center: (x0, y0) = " << grid_center_x << ", " << grid_center_z << std::endl;
+	int origin_grid_center_x = x_size_ / 2, origin_grid_center_z = z_size_ / 2;
 	
+	int curr_grid_shift_x = grid_center_x - origin_grid_center_x;
+	int curr_grid_shift_z = grid_center_z - origin_grid_center_z;
+	
+	if(curr_grid_shift_x == grid_shift_x_ && curr_grid_shift_z == grid_shift_z_ && !cube_positions.empty()) {	// no need to update
+		return false;
+	}
+
+	generateHeightMap();
 	generateCubes();
 	return true;
 }

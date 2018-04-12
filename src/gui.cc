@@ -81,7 +81,7 @@ void GUI::keyCallback(int key, int scancode, int action, int mods)
 			terrain_generator_->deleteCube(eye_, look_);
 			terrain_modified = true;
 		}
-	} else if (key == GLFW_KEY_T && action != GLFW_PRESS) {
+	} else if (key == GLFW_KEY_T && action == GLFW_PRESS) {
 		if(loading_mode_) {
 			terrain_generator_->addCube(eye_, look_);
 			terrain_modified = true;
