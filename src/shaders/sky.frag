@@ -123,9 +123,15 @@ void main()
   vec3 color_1 = vec3(0,0,0);
   vec3 cloud_color = vec3(0,0,0);
   if(is_moon == 1){
-    color_0 = vec3(1,1,1);
-    color_1 = vec3(1,1,1);
-    cloud_color = vec3(0,0,0);
+    if(day_time < (DAY_TIME + eps)){
+      color_0 = vec3(252, 240, 204) / 255.0 * 1.0;
+      color_1 = color_0;
+      cloud_color = color_0;
+    } else {
+      color_0 = vec3(1,1,1);
+      color_1 = vec3(1,1,1);
+      cloud_color = vec3(0,0,0);
+    }
   } else if(day_time < (DAY_TIME + eps)) {
     color_0 = vec3(135, 206, 250) / 255.0 * 1.0;
     color_1 = vec3(1,1,1);

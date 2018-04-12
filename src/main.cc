@@ -405,7 +405,7 @@ int main(int argc, char* argv[])
 				timeDiff = 0.0f;
 				totalTimeDifference = 0.0f;
 			}
-			if(timeDiff > 11.5f && timeDiff < 18.5f){
+			else if(timeDiff > 11.5f && timeDiff < 18.5f){
 				terrain_generator.updateMoonOffset();
 				if(timeDiff < 15.0f){
 					terrain_generator.moon_offset.y = 3.0f + (timeDiff - 11.5f) * (timeDiff - 11.5f) * 25.0f/3.5f;
@@ -429,7 +429,7 @@ int main(int argc, char* argv[])
 						terrain_generator.moon_offset.y = 43.f;
 					}
 				}
-				
+
 				terrain_generator.moon_offset.x += (timeDiff - 11.5f) * terrain_generator.getXSize()/7.0f;
 				
 				moon_pass.setup();
@@ -437,6 +437,42 @@ int main(int argc, char* argv[])
 			                              terrain_generator.moon_cube_faces.size() * 3,
 			                              GL_UNSIGNED_INT, 0));
 			}
+			else if(timeDiff < 10.0f){
+				terrain_generator.updateMoonOffset();
+				if(timeDiff < 5.0f){
+					terrain_generator.moon_offset.y = 3.0f + (timeDiff) * (timeDiff) * 25.0f/5.0f;
+					if(terrain_generator.moon_offset.y > 43.0f){
+						terrain_generator.moon_offset.y = 43.f;
+						// std::cout << timeDiff << "\n";
+					}
+
+					// std::cout << "increase" << terrain_generator.moon_offset.y << "\n";
+				} else {
+						terrain_generator.moon_offset.y = 3.0f + (timeDiff - 10.0f) * (timeDiff - 10.0f) * 25.0f/5.0f;
+						terrain_generator.moon_offset.y = (43.0f + 43.0f - terrain_generator.moon_offset.y);
+
+						// std::cout << "decrease" << terrain_generator.moon_offset.y << "\n";
+
+						if(terrain_generator.moon_offset.y < 0.0f) {
+							terrain_generator.moon_offset.y = 43.0f;
+						} else if(terrain_generator.moon_offset.y > 43.0f){
+							terrain_generator.moon_offset.y = 3.0f;
+							// std::cout << timeDiff << "\n";
+						} else {
+							terrain_generator.moon_offset.y = 43 - terrain_generator.moon_offset.y;
+						}
+
+						
+				}
+				
+				terrain_generator.moon_offset.x += timeDiff * terrain_generator.getXSize()/10.0f;
+				
+				moon_pass.setup();
+				CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
+			                              terrain_generator.moon_cube_faces.size() * 3,
+			                              GL_UNSIGNED_INT, 0));
+			}
+
 
 			sky_pass.setup();
 			CHECK_GL_ERROR(glDrawElements(GL_TRIANGLES,
