@@ -153,6 +153,7 @@ MatrixPointers GUI::getMatrixPointers() const
 void GUI::doJump(){
 	minecraft_character->jump();
 	eye_.y = minecraft_character->getCharacterPosition().y;
+	// std::cout << "Current eye" << glm::to_string(eye_) << "\n";
 }
 
 bool GUI::captureWASDUPDOWN(int key, int action)
@@ -247,6 +248,7 @@ void GUI::setJumpingCharacterHeight(glm::vec3 eye_move){
 	float next_y_coord = terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z);
 	eye_ += eye_move;
 	minecraft_character->position_y_ = (1.75f + next_y_coord);
+	// std::cout << "Current eye" << glm::to_string(eye_) << "\n";
 }
 
 void GUI::setInitCharacterHeight(){
@@ -261,17 +263,39 @@ bool GUI::setCharacterHeightToTerrain(glm::vec3 eye_move){
 	float max = next_y_coord;
 	// std::cout << "Current eye" << glm::to_string(eye_) << "\n";
 	// std::cout << "Direction I want to move" << glm::to_string(eye_move) << "\n";
- 	if(eye_move.x < 0.0){
+ 	if(eye_move.x < 0.1f){
 		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x - 0.4, eye_.z + eye_move.z));
 	}
-	else if (eye_move.x > 0.0) {
+	else if (eye_move.x > 0.1f) {
 		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x + 0.4, eye_.z + eye_move.z));
 	}
-	if(eye_move.z < 0.0){
+	if(eye_move.z < 0.1f){
 		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z - 0.4));	
 	}
-	else if (eye_move.z > 0.0){
+	else if (eye_move.z > 0.1f){
 		max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x, eye_.z + eye_move.z + 0.4));	
+	} 
+	if(ceilf(eye_.x) == eye_.x || ceilf(eye_.x + 0.25f) != ceilf(eye_.x)){
+		// std::cout << "x edge" << "\n";
+		if(eye_move.z < 0.0f){
+			max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x + 0.4, eye_.z + eye_move.z - 0.4));
+			max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x - 0.4, eye_.z + eye_move.z - 0.4));	
+		}
+		else if (eye_move.z > 0.0f){
+			max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x + 0.4, eye_.z + eye_move.z + 0.4));
+			max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x - 0.4, eye_.z + eye_move.z + 0.4));		
+		} 	
+	}
+	if(ceilf(eye_.z) == eye_.z || ceilf(eye_.z + 0.25f) != ceilf(eye_.z)){
+		// std::cout << "z edge" << "\n";
+		if(eye_move.x < 0.0f){
+			max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x - 0.4, eye_.z + eye_move.z - 0.4));
+			max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x - 0.4, eye_.z + eye_move.z + 0.4));
+		}
+		else if (eye_move.x > 0.0f) {
+			max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x + 0.4, eye_.z + eye_move.z - 0.4));
+			max = fmax(max, terrain_generator_->getHeight(eye_.x + eye_move.x + 0.4, eye_.z + eye_move.z + 0.4));
+		}
 	}
 	
 
